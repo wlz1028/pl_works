@@ -11,7 +11,7 @@ import os
 
 CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
 CLIENT_SECRET = '_5cneg88pgpKmwdOixxCOoSj'
-REDIRECT_URI = 'http://localhost:8080/redirect'
+REDIRECT_URI = 'http://ec2-54-86-87-188.compute-1.amazonaws.com:8080/redirect'
 SCOPE = 'https://www.googleapis.com/auth/userinfo.email',
 
 USER_HISTORY_PATH = './data/user_word_count_history.json'
@@ -24,7 +24,7 @@ session_opts = {
     'session.auto': True
 }
 app = SessionMiddleware(app(), session_opts)
-run(app=app)
+#run(app=app)
 
 @get('/')
 def root():
@@ -73,7 +73,7 @@ def error(q="General error"):
 def login():
     flow = flow_from_clientsecrets("client_secrets.json",
                                 scope=SCOPE,
-                                redirect_uri="http://localhost:8080/redirect")
+                                redirect_uri=REDIRECT_URI)
     uri = flow.step1_get_authorize_url()
     redirect(str(uri))
 
@@ -84,7 +84,7 @@ def redirect_page():
     flow = OAuth2WebServerFlow(client_id=CLIENT_ID,
                             client_secret=CLIENT_SECRET,
                             scope=SCOPE,
-                            redirect_uri='http://localhost:8080/redirect')
+                            redirect_uri=REDIRECT_URI)
     credentials = flow.step2_exchange(code)
     token = credentials.id_token['sub']
 
@@ -242,5 +242,11 @@ def isLogin():
     except:
         return False
 
-run(host='localhost', port=8080, debug=True)
-#run(host='0.0.0.0', port=80)
+#run(host='localhost', port=8080, debug=True)
+run(
+        app,                    # Run |app| Bottle() instance
+        host     = '0.0.0.0',
+        port     = 8080,
+        reloader = True,        # restarts the server every time edit a module file
+#        debug    = True         # Comment out it before deploy
+        )
