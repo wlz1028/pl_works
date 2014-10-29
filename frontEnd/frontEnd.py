@@ -1,10 +1,11 @@
-from bottle import run,route,get,post,request,static_file,redirect
+from bottle import run,route,get,post,request,static_file,redirect,app
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.client import flow_from_clientsecrets
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
 import httplib2
 import operator
+from beaker.middleware import SessionMiddleware
 
 CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
 CLIENT_SECRET = '_5cneg88pgpKmwdOixxCOoSj'
@@ -12,14 +13,36 @@ REDIRECT_URI = 'http://localhost:8080/redirect'
 SCOPE = 'https://www.googleapis.com/auth/userinfo.email',
 
 wordCountHistory = {}
+
+#setup beaker
+session_opts = {
+    'session.type': 'file',
+    'session.cookie_expires': 300,
+    'session.data_dir': './data',
+    'session.auto': True
+}
+app = SessionMiddleware(app(), session_opts)
+
+#@route('/test')
+#def test():
+#  s = request.environ.get('beaker.session')
+#  s['test'] = s.get('test',0) + 1
+#  s.save()
+#  return 'Test counter: %d' % s['test']
+
+run(app=app)
+
+#setup image fetch
 @route('/images/<filename:re:.*\.png>')
 def send_image(filename):
     return static_file(filename, root='./images', mimetype='image/png')
 
+#setup html fetch
 @route('/<filename:re:.*\.html>')
 def server_html_static(filename):
     return static_file(filename, root='./')
 
+#setup css fetch
 @route('/<filename:re:.*\.css>')
 def server_css_static(filename):
     return static_file(filename, root='./')
