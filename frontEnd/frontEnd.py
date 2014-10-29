@@ -24,9 +24,21 @@ def server_html_static(filename):
 def server_css_static(filename):
     return static_file(filename, root='./')
 
-@route('/', 'GET')
-def home():
-    redirect('search.html')
+@post('/search')
+def do_search():
+    #replace white space with %20
+    q = "%20".join(request.forms.get('keywords').split())
+    redirect('/result/{}'.format(q))
+
+@get('/result/<q>')
+def result(q):
+    #recover white space from %20
+    keyString = " ".join(q.split("%20"))
+    wc = query(keyString)
+    return wordCountHTML(wc,keyString)
+
+@route('/login', 'GET')
+def login():
     flow = flow_from_clientsecrets("client_secrets.json",
                                 scope=SCOPE,
                                 redirect_uri="http://localhost:8080/redirect")
@@ -53,23 +65,12 @@ def redirect_page():
     users_service = build('oauth2', 'v2', http=http)
     user_document = users_service.userinfo().get().execute()
     user_email = user_document['email']
-    redirect('/index.html')
+    return user_email
+#    redirect('/search')
 
-#    redirect("/index.html")
+    redirect("/index.html")
 
 #*****For future use: Can add the search String to the end of result page****
-@post('/search')
-def do_search():
-    #replace white space with %20
-    q = "%20".join(request.forms.get('keywords').split())
-    redirect('/result/{}'.format(q))
-
-@get('/result/<q>')
-def result(q):
-    #recover white space from %20
-    keyString = " ".join(q.split("%20"))
-    wc = query(keyString)
-    return wordCountHTML(wc,keyString)
 #***************************************END********************************
 
 #@post('/result')
