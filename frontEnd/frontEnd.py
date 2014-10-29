@@ -1,4 +1,4 @@
-from bottle import run,route,get,post,request,static_file,redirect,app
+from bottle import run,route,get,post,request,static_file,redirect,app,template
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.client import flow_from_clientsecrets
 from googleapiclient.errors import HttpError
@@ -47,6 +47,11 @@ def server_html_static(filename):
 def server_css_static(filename):
     return static_file(filename, root='./')
 
+@get('/search')
+def search():
+    user_info = request.environ.get('beaker.session')
+    return template('search',user=user_info)
+
 @post('/search')
 def do_search():
     #replace white space with %20
@@ -88,19 +93,16 @@ def redirect_page():
     users_service = build('oauth2', 'v2', http=http)
     user_document = users_service.userinfo().get().execute()
     user_email = user_document['email']
-    return user_email
-#    redirect('/search')
+    s = request.environ.get('beaker.session')
+    s['email'] = user_email
+    s.save()
+    redirect('/search')
 
-    redirect("/index.html")
-
-#*****For future use: Can add the search String to the end of result page****
-#***************************************END********************************
-
-#@post('/result')
-#def result():
-#    keyString = request.forms.get('keywords')
-#    wordCount = query(keyString)
-#    return wordCountHTML(wordCount,keyString)
+#todo: revoke auth page
+@get('/logout')
+def logout():
+    request.environ.get('beaker.session').delete()
+    redirect('/search')
 
 @get('/query')
 def queryResult():
