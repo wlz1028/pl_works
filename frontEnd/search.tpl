@@ -1,4 +1,4 @@
-    <html>
+<html>
     <head>
         <link REL="StyleSheet" TYPE="text/css" HREF="myStyle.css">
     </head>
@@ -21,10 +21,9 @@
     %else:
         Anonymous can <a href="/login">login</a><br>
     %end
-    %end
     </div>
 
     <div style="position: absolute; bottom: 0px;">&copy2014 Summer&Edward</div>
 
     </body>
-    </html>
+</html>

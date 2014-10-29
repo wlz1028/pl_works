@@ -6,46 +6,29 @@ from googleapiclient.discovery import build
 import httplib2
 import operator
 from beaker.middleware import SessionMiddleware
+import json
+import os
 
 CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
 CLIENT_SECRET = '_5cneg88pgpKmwdOixxCOoSj'
 REDIRECT_URI = 'http://localhost:8080/redirect'
 SCOPE = 'https://www.googleapis.com/auth/userinfo.email',
 
-wordCountHistory = {}
+USER_HISTORY_PATH = './data/user_word_count_history.json'
 
 #setup beaker
 session_opts = {
     'session.type': 'file',
-    'session.cookie_expires': 300,
+    'session.cookie_expires': 3600,
     'session.data_dir': './data',
     'session.auto': True
 }
 app = SessionMiddleware(app(), session_opts)
-
-#@route('/test')
-#def test():
-#  s = request.environ.get('beaker.session')
-#  s['test'] = s.get('test',0) + 1
-#  s.save()
-#  return 'Test counter: %d' % s['test']
-
 run(app=app)
 
-#setup image fetch
-@route('/images/<filename:re:.*\.png>')
-def send_image(filename):
-    return static_file(filename, root='./images', mimetype='image/png')
-
-#setup html fetch
-@route('/<filename:re:.*\.html>')
-def server_html_static(filename):
-    return static_file(filename, root='./')
-
-#setup css fetch
-@route('/<filename:re:.*\.css>')
-def server_css_static(filename):
-    return static_file(filename, root='./')
+@get('/')
+def root():
+    redirect('/search')
 
 @get('/search')
 def search():
@@ -60,11 +43,32 @@ def do_search():
 
 @get('/result/<q>')
 def result(q):
+    """
+    return search result HTML
+    """
     #recover white space from %20
     keyString = " ".join(q.split("%20"))
-    wc = query(keyString)
-    return wordCountHTML(wc,keyString)
+    wc = countWord(keyString)
+    return template('result', KEYSTRING=keyString, QUERY=wc, USER_DISPLAY=getUserDisplay())
 
+@get('/query')
+def queryResult():
+    """
+    return user history page HTML
+    """
+    if not isLogin():
+        return 'Please <a href="/login">login</a> to see your search history'
+    user_info = request.environ.get('beaker.session')
+    return template('user_search_history', USER_DISPLAY=getUserDisplay(), QUERY=getTop20(user_info['email']))
+
+@get('/error/<q>')
+def error(q="General error"):
+    """
+    return error message HTML
+    """
+    return "Opps!!<br>Error:{}".format(q)
+
+#login page
 @route('/login', 'GET')
 def login():
     flow = flow_from_clientsecrets("client_secrets.json",
@@ -73,11 +77,10 @@ def login():
     uri = flow.step1_get_authorize_url()
     redirect(str(uri))
 
+#login redirect
 @route('/redirect')
 def redirect_page():
     code = request.query.get('code','')
-    #change to elastic id -> redirect_uri
-    #redo oauth and client
     flow = OAuth2WebServerFlow(client_id=CLIENT_ID,
                             client_secret=CLIENT_SECRET,
                             scope=SCOPE,
@@ -95,22 +98,37 @@ def redirect_page():
     user_email = user_document['email']
     s = request.environ.get('beaker.session')
     s['email'] = user_email
+    s['login'] = True
     s.save()
     redirect('/search')
 
-#todo: revoke auth page
+#TODO: ISSUE-when user logout, and then login, no login page
 @get('/logout')
 def logout():
     request.environ.get('beaker.session').delete()
     redirect('/search')
 
-@get('/query')
-def queryResult():
-    Top20 = getTop20(wordCountHistory)
-    return top20HTML(Top20)
+#setup image fetch
+@route('/images/<filename:re:.*\.png>')
+def send_image(filename):
+    return static_file(filename, root='./images', mimetype='image/png')
+
+#setup html fetch
+@route('/<filename:re:.*\.html>')
+def server_html_static(filename):
+    return static_file(filename, root='./')
+
+#setup css fetch
+@route('/<filename:re:.*\.css>')
+def server_css_static(filename):
+    return static_file(filename, root='./')
 
 #count words in the input String, save to a dictionary
-def query(keyString):
+def countWord(keyString):
+    """
+    return word,count dictionary
+    store user search word count on disk
+    """
     wordCount = {}
     for word in keyString.split():
         word = word.lower()
@@ -119,95 +137,110 @@ def query(keyString):
             wordCount[word] += 1
         else:
             wordCount[word] = 1
-        # Store searching history
-        global wordCountHistory
-        if word in wordCountHistory:
-            wordCountHistory[word] += 1
-        else:
-            wordCountHistory[word] = 1
+
+        # Store searching history on disk in json format
+        if isLogin():
+            user_info = request.environ.get('beaker.session')
+            storeWordCountHistory(user_info['email'], word)
     return wordCount
 
-#**************For future use: change table style**************
-def getTableHeader():
-    headerFont = '''
-           <head>
-           <style>
-                table {
-                    width:20%;
-                }
-                table, th, td {
-                    border-collapse: collapse;
-                }
-                th, td { padding: 5px;
-                         text-align: left;
-                }
-                tr:nth-child(even) {
-                    background-color: #ADBDCD;
-                    color: white;
-                }
-                tr:nth-child(odd) {
-                    background-color: #7F98B2;
-                    color: white;
-                }
-                th {
-                    background-color:#4D7094;
-                    color: white;
-                }
-           </style>
-           </head>
-    '''
-    return headerFont
+def storeWordCountHistory(user_email, word):
+    """
+    return None
+    Store user history to disk
+    """
+    #Load or create user history json file
+    try:
+        with open(USER_HISTORY_PATH, 'r+') as f:
+            history = json.load(f)
+    except:
+        with open(USER_HISTORY_PATH, 'w') as f:
+            history = {}
 
-def getAttributes():
-    attributes = '''
-                    <tr>
-                        <th>{COLUMN1}</th>
-                        <th>{COLUMN2}</th>
-                    </tr>
-    '''
-    return attributes
+    #update user history file
+    with open(USER_HISTORY_PATH, "w") as f:
+        if not user_email in history:
+            history[user_email] = {}
+        if word in history[user_email]:
+            history[user_email][word] += 1
+        else:
+            history[user_email][word] = 1
+        json.dump(history,f,indent=4)
 
-def getRow():
-    row = '''
-            <tr>
-                <td>{COLUMN1}</td>
-                <td>{COLUMN2}</td>
-            </tr>
-    '''
-    return row
+def get_user_history(user_email):
+    """
+    return user history disctionary
+    return {} if user history not found on disk
+    """
+    with open(USER_HISTORY_PATH, 'r') as f:
+        history = json.load(f)
+    if user_email in history:
+        return history[user_email]
+    else:
+        return {}
 
-#creating a html using the queried dictionary
-def wordCountHTML(query, keyString):
-    heading = '''<h2>Search for"{KEYSTRING}"</h2>'''
-    tableName = '''<table id="results">'''
-    #headerFont = getTableHeader()
-    attributes = getAttributes().format(COLUMN1 = "Word", COLUMN2 = "Count")
-    HTML = heading.format(KEYSTRING=keyString) + tableName + attributes
-    row = getRow()
-    for word,count in query.iteritems():
-        HTML += row.format(COLUMN1=word,COLUMN2=count)
-    HTML += "</table>"
-    HTML += "<p><a href='/'>Back to Index</a></p>"
-    return HTML
 
-#Store all words count information since the server is started, save results in a list
-def getTop20(wordCountHistory):
-    sortedKW = sorted(wordCountHistory.items(), key=operator.itemgetter(1),reverse = True)
+#Pretty table
+#def getTableHeader():
+#    headerFont = '''
+#           <head>
+#           <style>
+#                table {
+#                    width:20%;
+#                }
+#                table, th, td {
+#                    border-collapse: collapse;
+#                }
+#                th, td { padding: 5px;
+#                         text-align: left;
+#                }
+#                tr:nth-child(even) {
+#                    background-color: #ADBDCD;
+#                    color: white;
+#                }
+#                tr:nth-child(odd) {
+#                    background-color: #7F98B2;
+#                    color: white;
+#                }
+#                th {
+#                    background-color:#4D7094;
+#                    color: white;
+#                }
+#           </style>
+#           </head>
+#    '''
+#    return headerFont
+
+def getTop20(user_email):
+    """
+    return user top 20 word count history
+    """
+    user_history = get_user_history(user_email)
+    sortedKW = sorted(user_history.items(), key=operator.itemgetter(1),reverse = True)
     return sortedKW[:20]
 
-#creating a html using the sorted list
-def top20HTML(top20):
-    heading = '''<h2>Top 20 key words</h2>'''
-    tableName = '''<table id="history">'''
-    #headerFont = getTableHeader()
-    attributes = getAttributes().format(COLUMN1 = "Word", COLUMN2 = "count")
-    HTML = tableName + attributes
-    row = getRow()
-    for word,count in top20:
-        HTML += row.format(COLUMN1=word,COLUMN2=count)
-    HTML +="</table>"
-    HTML += "<p><a href='/'>Back to Index</a></p>"
-    return HTML
+def getUserDisplay():
+    """
+    return user information HTML
+    """
+    user_info = request.environ.get('beaker.session')
+    try:
+        display = user_info['email']
+    except:
+        display = 'Anonymous can <a href="/login">login</a><br>'
+    return display
+
+def isLogin():
+    """
+    return true if current user if login, false otherwise
+    """
+    try:
+        if request.environ.get('beaker.session')['login']:
+            return True
+        else:
+            return False
+    except:
+        return False
 
 run(host='localhost', port=8080, debug=True)
 #run(host='0.0.0.0', port=80)
