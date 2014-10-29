@@ -3,6 +3,7 @@ from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.client import flow_from_clientsecrets
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
+import httplib2
 import operator
 
 CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
@@ -25,6 +26,7 @@ def server_css_static(filename):
 
 @route('/', 'GET')
 def home():
+    redirect('search.html')
     flow = flow_from_clientsecrets("client_secrets.json",
                                 scope=SCOPE,
                                 redirect_uri="http://localhost:8080/redirect")
@@ -51,30 +53,30 @@ def redirect_page():
     users_service = build('oauth2', 'v2', http=http)
     user_document = users_service.userinfo().get().execute()
     user_email = user_document['email']
-    return user_email
+    redirect('/index.html')
 
 #    redirect("/index.html")
 
 #*****For future use: Can add the search String to the end of result page****
-#@post('/')
-#def do_search():
+@post('/search')
+def do_search():
     #replace white space with %20
-    #q = "%20".join(request.forms.get('keywords').split())
-    #redirect('/result/{}'.format(q))
+    q = "%20".join(request.forms.get('keywords').split())
+    redirect('/result/{}'.format(q))
 
-#@get('/result/<q>')
-#def result(q):
+@get('/result/<q>')
+def result(q):
     #recover white space from %20
-    #keyString = " ".join(q.split("%20"))
-    #wc = query(keyString)
-    #return wordCountHTML(wc,keyString)
+    keyString = " ".join(q.split("%20"))
+    wc = query(keyString)
+    return wordCountHTML(wc,keyString)
 #***************************************END********************************
 
-@post('/result')
-def result():
-    keyString = request.forms.get('keywords')
-    wordCount = query(keyString)
-    return wordCountHTML(wordCount,keyString)
+#@post('/result')
+#def result():
+#    keyString = request.forms.get('keywords')
+#    wordCount = query(keyString)
+#    return wordCountHTML(wordCount,keyString)
 
 @get('/query')
 def queryResult():
@@ -181,5 +183,5 @@ def top20HTML(top20):
     HTML += "<p><a href='/'>Back to Index</a></p>"
     return HTML
 
-#run(host='localhost', port=8080, debug=True)
-run(host='0.0.0.0', port=80)
+run(host='localhost', port=8080, debug=True)
+#run(host='0.0.0.0', port=80)
