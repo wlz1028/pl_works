@@ -1,0 +1,1 @@
+Front end: - In python: import frontEnd- In browser, connect to local server: http://localhost:8080/- Input string, click “GO!” button to get words count results- Click “Top 20 Keywords” to check the top 20 keywords and the total number of times that these words have been searched
