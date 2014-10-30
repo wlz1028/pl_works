@@ -13,4 +13,4 @@
     </tr>
     %end
 </table>
-<p><a href='/search'>Back to Index</a></p>
+<p><a href='/search'>Back to Search</a></p>

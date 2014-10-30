@@ -15,8 +15,12 @@
 
     <div>
     %if "email" in user:
-        <a href="/query">Top 20 Keywords</a><br>
-        Welcome: {{user["email"]}}
+        <a href="/query">Top 20 Keywords</a> for {{user["email"]}}
+            <p>
+	    %for word,count in QUERY:
+	        <b>{{word}}</b>: {{count}} |
+	    %end
+            </p>
         <a href='/logout'>logout</a>
     %else:
         Anonymous can <a href="/login">login</a><br>

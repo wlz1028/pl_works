@@ -33,7 +33,13 @@ def root():
 @get('/search')
 def search():
     user_info = request.environ.get('beaker.session')
-    return template('search',user=user_info)
+    try:
+        topHist = getTop20(user_info['email'])
+        if len(topHist) > 10:
+            topHist = topHist[:10]
+    except:
+        topHist = []
+    return template('search',user=user_info,QUERY=topHist)
 
 @post('/search')
 def do_search():
@@ -172,8 +178,12 @@ def get_user_history(user_email):
     return user history disctionary
     return {} if user history not found on disk
     """
-    with open(USER_HISTORY_PATH, 'r') as f:
-        history = json.load(f)
+    try:
+    	with open(USER_HISTORY_PATH, 'r') as f:
+    	    history = json.load(f)
+    except:
+	return {}
+
     if user_email in history:
         return history[user_email]
     else:
@@ -225,7 +235,7 @@ def getUserDisplay():
     """
     user_info = request.environ.get('beaker.session')
     try:
-        display = user_info['email']
+        display = user_info['email'] + ' <a href="/logout">logout</a><br>'
     except:
         display = 'Anonymous can <a href="/login">login</a><br>'
     return display
