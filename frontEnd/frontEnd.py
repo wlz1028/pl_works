@@ -33,7 +33,7 @@ def root():
 @get('/search')
 def search():
     user_info = request.environ.get('beaker.session')
-    if login():
+    if isLogin():
         topHist = getTop20(user_info['email'])
         if len(topHist) > 10:
             topHist = topHist[:10]
