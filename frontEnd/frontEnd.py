@@ -12,7 +12,7 @@ import os
 CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
 CLIENT_SECRET = '_5cneg88pgpKmwdOixxCOoSj'
 REDIRECT_URI = 'http://ec2-54-86-87-188.compute-1.amazonaws.com:8080/redirect'
-SCOPE = 'https://www.googleapis.com/auth/userinfo.email',
+SCOPE = 'https://www.googleapis.com/auth/userinfo.email'
 
 USER_HISTORY_PATH = './data/user_word_count_history.json'
 
@@ -33,11 +33,11 @@ def root():
 @get('/search')
 def search():
     user_info = request.environ.get('beaker.session')
-    try:
+    if login():
         topHist = getTop20(user_info['email'])
         if len(topHist) > 10:
             topHist = topHist[:10]
-    except:
+    else:
         topHist = []
     return template('search',user=user_info,QUERY=topHist)
 
