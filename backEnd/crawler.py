@@ -57,6 +57,7 @@ class crawler(object):
         self._inverted_word_id_cache = { }
         #lizwang: store url description
         self._url_description = {}
+        self._links = []
 
         # functions to call when entering and exiting specific tags
         self._enter = defaultdict(lambda *a, **ka: self._visit_ignore)
@@ -160,9 +161,12 @@ class crawler(object):
         return word_id
 
     #lizwang
+    def get_links(self):
+        return self._links
+    #lizwang
     def get_word_id(self):
         return self._word_id_cache
-    
+
     def document_id(self, url):
         """Get the document id for some url."""
         if url in self._doc_id_cache:
@@ -176,9 +180,19 @@ class crawler(object):
         self._doc_id_cache[url] = doc_id
         return doc_id
 
+#    #lizwang
+#    def get_inverted_doc_id(self):
+#        result = {}
+#        for url, _id in self._doc_id_cache.items():
+#            result[_id] = url
+#        return result
+
     #lizwang
     def get_document_id(self):
         return self._doc_id_cache
+    #lizwang
+    def get_inverted_doc_id_cache(self):
+        return self._inverted_doc_id_cache
 
     #lizwang
     def create_inverted_id(self):
@@ -206,7 +220,8 @@ class crawler(object):
     def add_link(self, from_doc_id, to_doc_id):
         """Add a link into the database, or increase the number of links between
         two pages in the database."""
-        # TODO
+        #lizwang
+        self._links.append((from_doc_id, to_doc_id))
 
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
@@ -278,7 +293,7 @@ class crawler(object):
         """Add some text to the document. This records word ids and word font sizes
         into the self._curr_words list for later processing."""
         words = WORD_SEPARATORS.split(elem.string.lower())
-        #lizwng add description  and text len is controled by DESCRIPTION_LEN
+        #lizwang add description  and text len is controled by DESCRIPTION_LEN
         sentence = " ".join(" ".join(words).split())
         if self._desc_word_count < DESCRIPTION_LEN:
             if len(sentence) <= DESCRIPTION_LEN - self._desc_word_count:
@@ -345,9 +360,9 @@ class crawler(object):
                         self._exit[stack[-1].name.lower()](stack[-1])
                         stack.pop()
                         tag = NextTag(tag.parent.nextSibling)
-                    
+
                     continue
-                
+
                 # enter the tag
                 self._enter[tag_name](tag)
                 stack.append(tag)
