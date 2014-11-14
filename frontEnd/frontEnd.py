@@ -69,6 +69,7 @@ def result(q, p=1):
     """
     #recover white space from %20
     keyString = " ".join(q.split("%20"))
+    keyString = keyString.lower()
     wc = countWord(keyString)
     first_word = keyString.split()[0]
     word_id = get_word_id(first_word)
