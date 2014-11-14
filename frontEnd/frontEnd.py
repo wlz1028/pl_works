@@ -1,13 +1,14 @@
-from bottle import run,route,get,post,request,static_file,redirect,app,template
+from bottle import run,route,get,post,request,static_file,redirect,app,template,error
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.client import flow_from_clientsecrets
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
+from mongodb import get_word_id,get_doc_ids,get_sorted_docs,get_sorted_urls
 import httplib2
 import operator
 from beaker.middleware import SessionMiddleware
 import json
-import os
+import os,math
 
 CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
 CLIENT_SECRET = '_5cneg88pgpKmwdOixxCOoSj'
@@ -45,17 +46,46 @@ def search():
 def do_search():
     #replace white space with %20
     q = "%20".join(request.forms.get('keywords').split())
-    redirect('/result/{}'.format(q))
+    redirect('/result/{}/{}'.format(q,1))
 
-@get('/result/<q>')
-def result(q):
+#@get('/result')
+#def result(q):
+#    """
+#    return search result HTML
+#    """
+#    return "please enter something"
+
+@get('/test')
+def test():
+    message = '\"{}\"Cannot be found'.format(keyString)
+    return template('error',ERRORMESSAGE=message)
+
+
+
+@get('/result/<q>/<p>')
+def result(q, p=1):
     """
     return search result HTML
     """
     #recover white space from %20
     keyString = " ".join(q.split("%20"))
     wc = countWord(keyString)
-    return template('result', KEYSTRING=keyString, QUERY=wc, USER_DISPLAY=getUserDisplay())
+    first_word = keyString.split()[0]
+    word_id = get_word_id(first_word)
+    doc_ids = get_doc_ids(word_id)
+    sorted_doc_ids = get_sorted_docs(doc_ids)
+    sorted_url = get_sorted_urls(sorted_doc_ids)
+    page = int(p)
+    previous = page-1
+    nextpage = page+1
+
+    if page > math.ceil(len(sorted_url)/float(10)) and page!=1:
+        return error404(404)
+    if not sorted_url:
+        message = '"{}" Cannot be found'.format(keyString)
+        return template('error',ERRORMESSAGE=message)
+
+    return template('result', KEYSTRING=keyString, URLS=sorted_url, PAGE_NUMBER=page, PREVIOUS=previous, NEXT=nextpage, USER_DISPLAY=getUserDisplay(),QUERY=q)
 
 @get('/query')
 def queryResult():
@@ -67,12 +97,12 @@ def queryResult():
     user_info = request.environ.get('beaker.session')
     return template('user_search_history', USER_DISPLAY=getUserDisplay(), QUERY=getTop20(user_info['email']))
 
-@get('/error/<q>')
-def error(q="General error"):
-    """
-    return error message HTML
-    """
-    return "Opps!!<br>Error:{}".format(q)
+#@get('/error/<q>')
+#def general_error(q="General error"):
+#    """
+#    return error message HTML
+#    """
+#    return "Opps!!<br>Error:{}".format(q)
 
 #login page
 @route('/login', 'GET')
@@ -113,6 +143,10 @@ def redirect_page():
 def logout():
     request.environ.get('beaker.session').delete()
     redirect('/search')
+
+@error(404)
+def error404(error):
+    return template('error',ERRORMESSAGE="404 Page Not Found")
 
 #setup image fetch
 @route('/images/<filename:re:.*\.png>')
