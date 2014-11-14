@@ -1,4 +1,3 @@
-
 # Copyright (C) 2011 by Peter Goodman
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,6 +23,7 @@ import urlparse
 from BeautifulSoup import *
 from collections import defaultdict
 import re
+import threading,time
 
 DESCRIPTION_LEN = 250
 
@@ -226,7 +226,7 @@ class crawler(object):
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
-        print "document title="+ repr(title_text)
+#        print "document title="+ repr(title_text)
         if not self._url_description[self._curr_doc_id]["title"]:
             self._url_description[self._curr_doc_id]["title"] = title_text
 
@@ -375,22 +375,40 @@ class crawler(object):
         """Crawl the web!"""
         seen = set()
 
-        while len(self._url_queue):
-            url, depth_ = self._url_queue.pop()
+        threadList = []
+        class Thread(threading.Thread):
+            def __init__(self, t, *args):
+                threading.Thread.__init__(self, target=t, args=args)
+                self.start()
 
-            # skip this url; it's too deep
-            if depth_ > depth:
-                continue
+        while len(self._url_queue) or threading.activeCount()>1:
+            print threading.activeCount()
+            try:
+                url, depth_ = self._url_queue.pop()
 
-            doc_id = self.document_id(url)
+                # skip this url; it's too deep
+                if depth_ > depth:
+                    continue
 
-            # we've already seen this document
-            if doc_id in seen:
-                continue
+                doc_id = self.document_id(url)
 
-            seen.add(doc_id) # mark this document as haven't been visited
+                # we've already seen this document
+                if doc_id in seen:
+                    continue
 
-            socket = None
+                seen.add(doc_id) # mark this document as haven't been visited
+
+                Thread(self.crawlThread, url,  doc_id, depth_, timeout)
+            except:
+                pass
+
+        self.create_inverted_id()
+
+    def crawlThread(self, url, doc_id, depth_, timeout):
+        print "******depth = ",depth_
+        lock = threading.Lock()
+        socket = None
+        with lock:
             try:
                 socket = urllib2.urlopen(url, timeout=timeout)
                 soup = BeautifulSoup(socket.read())
@@ -402,7 +420,7 @@ class crawler(object):
                 self._curr_words = [ ]
                 self._index_document(soup)
                 self._add_words_to_document()
-                print "    url="+repr(self._curr_url)
+#                print "    url="+repr(self._curr_url)
 
             except Exception as e:
                 print e
@@ -410,7 +428,6 @@ class crawler(object):
             finally:
                 if socket:
                     socket.close()
-        self.create_inverted_id()
 
 if __name__ == "__main__":
     bot = crawler(None, "urls.txt")
