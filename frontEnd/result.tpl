@@ -1,8 +1,8 @@
 <html>
 %import math
 <head>
-<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 <link rel="stylesheet" type="text/css" href="/mystyle.css">
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
 </head>
 
     <body>
@@ -17,10 +17,13 @@
     <h1>Search for"{{KEYSTRING}}"</h1>
     <table id="results">
     
-        %total = 2
+        %import math
+        %total = int(math.ceil(len(URLS)/10.0))
+        %print total
+        %print total
         %for n in URLS[10*PAGE_NUMBER-10:PAGE_NUMBER*10]:
         <tr>
-            <td><a href="http://{{n}}" target="_blank" style="margin-left: 1cm">{{n}}</a></td>
+            <td><a href='{{n}}' target="_blank" style="margin-left: 1cm">{{n}}</a></td>
         </tr>
         %end
     </table>

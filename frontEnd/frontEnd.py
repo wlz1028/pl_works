@@ -12,7 +12,7 @@ import os,math
 
 CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
 CLIENT_SECRET = '_5cneg88pgpKmwdOixxCOoSj'
-REDIRECT_URI = 'http://localhost:8080/redirect'
+REDIRECT_URI = 'http://ec2-54-86-113-124.compute-1.amazonaws.com:8080/redirect'
 SCOPE = 'https://www.googleapis.com/auth/userinfo.email'
 
 USER_HISTORY_PATH = './data/user_word_count_history.json'
@@ -75,7 +75,9 @@ def result(q, p=1):
     doc_ids = get_doc_ids(word_id)
     sorted_doc_ids = get_sorted_docs(doc_ids)
     sorted_url = get_sorted_urls(sorted_doc_ids)
+    print sorted_url
     page = int(p)
+    print page
     previous = page-1
     nextpage = page+1
 
@@ -286,7 +288,7 @@ def isLogin():
     except:
         return False
 
-run(app, host='localhost', port=8080, debug=True)
+#run(app, host='localhost', port=8080, debug=True)
 run(
         app,                    # Run |app| Bottle() instance
         host     = '0.0.0.0',
