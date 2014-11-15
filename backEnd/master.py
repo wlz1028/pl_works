@@ -11,14 +11,11 @@ def word_id_index(lexcon, inverted_index):
     mongo_doc = [{"_id": word_id, "doc_ids": list(inverted_index[word_id]), "word": word} for word, word_id in lexcon.items() ]
     write_records(mongo_doc, "csc326", "word_id_index")
 
-
-
-if __name__ == "__main__":
-    print 'haha'
-    bot = crawler(None, "urls.txt")
-    bot.crawl(depth=1)
-    print 'haha'
+def main(urls_file, _depth):
+    bot = crawler(None, urls_file)
+    bot.crawl(depth=_depth)
     doc_id_index(bot.get_links(), bot.get_inverted_doc_id_cache())
     word_id_index(bot.get_word_id(), bot.get_inverted_index())
-    
 
+if __name__ == "__main__":
+    main("urls.txt", 1)

@@ -226,7 +226,7 @@ class crawler(object):
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
-        print "document title="+ repr(title_text)
+#        print "document title="+ repr(title_text)
         if not self._url_description[self._curr_doc_id]["title"]:
             self._url_description[self._curr_doc_id]["title"] = title_text
 
@@ -255,7 +255,7 @@ class crawler(object):
         # TODO: knowing self._curr_doc_id and the list of all words and their
         #       font sizes (in self._curr_words), add all the words into the
         #       database for this document
-        print "    num words="+ str(len(self._curr_words))
+#        print "    num words="+ str(len(self._curr_words))
         #lizwang
         for word_id_tuple in self._curr_words:
             word_id = word_id_tuple[0]
@@ -402,10 +402,10 @@ class crawler(object):
                 self._curr_words = [ ]
                 self._index_document(soup)
                 self._add_words_to_document()
-                print "    url="+repr(self._curr_url)
+#                print "    url="+repr(self._curr_url)
 
             except Exception as e:
-                print e
+#                print e
                 pass
             finally:
                 if socket:

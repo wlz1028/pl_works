@@ -24,6 +24,7 @@ from BeautifulSoup import *
 from collections import defaultdict
 import re
 import threading,time
+import logging
 
 DESCRIPTION_LEN = 250
 
@@ -255,7 +256,7 @@ class crawler(object):
         # TODO: knowing self._curr_doc_id and the list of all words and their
         #       font sizes (in self._curr_words), add all the words into the
         #       database for this document
-        print "    num words="+ str(len(self._curr_words))
+#        print "    num words="+ str(len(self._curr_words))
         #lizwang
         for word_id_tuple in self._curr_words:
             word_id = word_id_tuple[0]
@@ -376,13 +377,14 @@ class crawler(object):
         seen = set()
 
         threadList = []
+        #Thread helper class to handle each new thread
         class Thread(threading.Thread):
             def __init__(self, t, *args):
                 threading.Thread.__init__(self, target=t, args=args)
+                self.setDaemon(True)
                 self.start()
 
         while len(self._url_queue) or threading.activeCount()>1:
-            print threading.activeCount()
             try:
                 url, depth_ = self._url_queue.pop()
 
@@ -396,16 +398,32 @@ class crawler(object):
                 if doc_id in seen:
                     continue
 
-                seen.add(doc_id) # mark this document as haven't been visited
+                seen.add(doc_id)
 
+                #For each url, open a new thread
                 Thread(self.crawlThread, url,  doc_id, depth_, timeout)
-            except:
+
+                #Wait thread to be executed, so we dont overload CPU
+                if threading.activeCount() > 100:
+                    main_thread = threading.currentThread()
+                    #this works like timeout
+                    for t in threading.enumerate():
+                        #prevent a deadlock case
+                        if t is main_thread:
+                            continue
+#                        print 'joining %s', t.getName()
+                        t.join()
+            except IndexError as ex:
                 pass
+            except Exception as ex:
+                logging.exception("")
+                raise Exception("")
 
         self.create_inverted_id()
 
+    #Thread helper function, to process each url, and lock shared recourse
     def crawlThread(self, url, doc_id, depth_, timeout):
-        print "******depth = ",depth_
+#        print "******depth = ",depth_
         lock = threading.Lock()
         socket = None
         with lock:
@@ -423,15 +441,17 @@ class crawler(object):
 #                print "    url="+repr(self._curr_url)
 
             except Exception as e:
-                print e
+#                print e
                 pass
             finally:
                 if socket:
                     socket.close()
 
 if __name__ == "__main__":
+    start = time.time()
     bot = crawler(None, "urls.txt")
     bot.crawl(depth=1)
     print len(bot.get_links())
     print len(bot.get_word_id())
     print len(bot.get_inverted_index())
+    print time.time() - start
