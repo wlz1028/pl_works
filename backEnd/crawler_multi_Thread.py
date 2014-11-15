@@ -381,10 +381,19 @@ class crawler(object):
         class Thread(threading.Thread):
             def __init__(self, t, *args):
                 threading.Thread.__init__(self, target=t, args=args)
-                self.setDaemon(True)
+#                self.setDaemon(True)
                 self.start()
+            def wait_thread():
+                main_thread = threading.currentThread()
+                #this works like timeout
+                for t in threading.enumerate():
+                    #prevent a deadlock case
+                    if t is main_thread:
+                        continue
+                    t.join()
 
         while len(self._url_queue) or threading.activeCount()>1:
+            #Wait thread to be executed, so we dont overload CPU
             try:
                 url, depth_ = self._url_queue.pop()
 
@@ -402,23 +411,15 @@ class crawler(object):
 
                 #For each url, open a new thread
                 Thread(self.crawlThread, url,  doc_id, depth_, timeout)
-
-                #Wait thread to be executed, so we dont overload CPU
+                #If more then 100 active thread, wait 5ms
                 if threading.activeCount() > 100:
-                    main_thread = threading.currentThread()
-                    #this works like timeout
-                    for t in threading.enumerate():
-                        #prevent a deadlock case
-                        if t is main_thread:
-                            continue
-#                        print 'joining %s', t.getName()
-                        t.join()
-            except IndexError as ex:
-                pass
-            except Exception as ex:
-                logging.exception("")
-                raise Exception("")
+                    time.sleep(0.005)
 
+            except Exception as ex:
+                pass
+
+        #wait all thread to be exec
+        time.sleep(2)
         self.create_inverted_id()
 
     #Thread helper function, to process each url, and lock shared recourse

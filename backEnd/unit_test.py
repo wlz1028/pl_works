@@ -3,11 +3,14 @@ import crawler_multi_Thread as cmt
 import time
 import master
 from mongodb import get_word_id, get_doc_ids, get_sorted_docs,get_sorted_urls,drop_db
+import logging
 
 """
 test.html file has 15 unique words and 5 redundent words, and 2 url links
 test_url.txt has test.html path to be passed to crawler
 """
+
+ALLOWRANCE = 10
 
 def test_single_thread_crawler():
     """
@@ -20,6 +23,7 @@ def test_single_thread_crawler():
         assert len(bot.get_word_id()) == 15
         assert len(bot.get_inverted_index()) == 15
     except:
+        logging.exception("")
         return False
     return True
 
@@ -67,19 +71,20 @@ def test_multi_thread_crawler():
         print "links"
         print len(single.get_links())
         print len(multi.get_links())
-        assert len(single.get_links()) == len(multi.get_links())
+        assert abs(len(single.get_links()) - len(multi.get_links())) < ALLOWRANCE
 #        print "####Compare num of word id"
 
         print "word_id"
         print len(single.get_word_id())
         print len(multi.get_word_id())
-        assert len(single.get_word_id()) == len(multi.get_word_id())
+        assert abs(len(single.get_word_id()) - len(multi.get_word_id())) < ALLOWRANCE
 #        print "####Compare num of inverted index"
         print "inverted"
         print len(single.get_inverted_index())
         print len(multi.get_inverted_index())
-        assert len(single.get_inverted_index()) == len(multi.get_inverted_index())
+        assert abs(len(single.get_inverted_index()) - len(multi.get_inverted_index())) < ALLOWRANCE
     except:
+        logging.exception("")
         return False
     return True
 
@@ -99,6 +104,7 @@ def test_persistent():
         _doc_ids = bot._inverted_index[_id]
         assert get_doc_ids(_id) == list(bot._inverted_index[_id])
     except:
+        logging.exception("")
         return False
     return True
 
