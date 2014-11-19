@@ -418,3 +418,4 @@ if __name__ == "__main__":
     print len(bot.get_links())
     print len(bot.get_word_id())
     print len(bot.get_inverted_index())
+    print len(bot._url_queue)

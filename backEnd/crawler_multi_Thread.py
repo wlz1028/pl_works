@@ -60,6 +60,8 @@ class crawler(object):
         self._url_description = {}
         self._links = []
 
+        self._lock = threading.RLock()
+
         # functions to call when entering and exiting specific tags
         self._enter = defaultdict(lambda *a, **ka: self._visit_ignore)
         self._exit = defaultdict(lambda *a, **ka: self._visit_ignore)
@@ -413,24 +415,38 @@ class crawler(object):
                 Thread(self.crawlThread, url,  doc_id, depth_, timeout)
                 #If more then 100 active thread, wait 5ms
                 if threading.activeCount() > 100:
-                    time.sleep(0.005)
+                    time.sleep(0.005*2)
 
             except Exception as ex:
                 pass
 
         #wait all thread to be exec
-        time.sleep(2)
+        time.sleep(1)
         self.create_inverted_id()
 
     #Thread helper function, to process each url, and lock shared recourse
     def crawlThread(self, url, doc_id, depth_, timeout):
 #        print "******depth = ",depth_
-        lock = threading.Lock()
         socket = None
-        with lock:
+        try:
+            socket = urllib2.urlopen(url, timeout=timeout)
+            soup = BeautifulSoup(socket.read())
+        except:
+            pass
+        with self._lock:
             try:
-                socket = urllib2.urlopen(url, timeout=timeout)
-                soup = BeautifulSoup(socket.read())
+#                self._url_queue
+#                self._doc_id_cache
+#                self._word_id_cache
+#                #lizwang
+#                self._inverted_index
+#                self._resolved_inverted_index
+#                self._inverted_doc_id_cache
+#                self._inverted_word_id_cache
+#                #lizwang: store url description
+#                self._url_description
+#                self._links
+#                self._inverted_index
 
                 self._curr_depth = depth_ + 1
                 self._curr_url = url
@@ -455,4 +471,5 @@ if __name__ == "__main__":
     print len(bot.get_links())
     print len(bot.get_word_id())
     print len(bot.get_inverted_index())
+    print len(bot._url_queue)
     print time.time() - start
