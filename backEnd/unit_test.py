@@ -69,19 +69,13 @@ def test_multi_thread_crawler():
         # c)compare result
 #        print "####Compare num of links"
         print "links"
-        print len(single.get_links())
-        print len(multi.get_links())
         assert abs(len(single.get_links()) - len(multi.get_links())) < ALLOWRANCE
 #        print "####Compare num of word id"
 
         print "word_id"
-        print len(single.get_word_id())
-        print len(multi.get_word_id())
         assert abs(len(single.get_word_id()) - len(multi.get_word_id())) < ALLOWRANCE
 #        print "####Compare num of inverted index"
         print "inverted"
-        print len(single.get_inverted_index())
-        print len(multi.get_inverted_index())
         assert abs(len(single.get_inverted_index()) - len(multi.get_inverted_index())) < ALLOWRANCE
     except:
         logging.exception("")

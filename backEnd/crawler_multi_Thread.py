@@ -379,12 +379,17 @@ class crawler(object):
         seen = set()
 
         threadList = []
+
+        ##############################################
+        ##############################################
         #Thread helper class to handle each new thread
+        ##############################################
+        ##############################################
         class Thread(threading.Thread):
             def __init__(self, t, *args):
                 threading.Thread.__init__(self, target=t, args=args)
-#                self.setDaemon(True)
                 self.start()
+            #Wait all current thread to be executed
             def wait_thread():
                 main_thread = threading.currentThread()
                 #this works like timeout
@@ -413,18 +418,20 @@ class crawler(object):
 
                 #For each url, open a new thread
                 Thread(self.crawlThread, url,  doc_id, depth_, timeout)
-                #If more then 100 active thread, wait 5ms
-                if threading.activeCount() > 100:
-                    time.sleep(0.005*2)
+                #The CPU that run this test support 4 threads
+                if threading.activeCount() >= 4:
+                    Thread.wait_thread()
 
             except Exception as ex:
                 pass
 
-        #wait all thread to be exec
-        time.sleep(1)
         self.create_inverted_id()
 
+    ##############################################
+    ##############################################
     #Thread helper function, to process each url, and lock shared recourse
+    ##############################################
+    ##############################################
     def crawlThread(self, url, doc_id, depth_, timeout):
 #        print "******depth = ",depth_
         socket = None
@@ -435,19 +442,6 @@ class crawler(object):
             pass
         with self._lock:
             try:
-#                self._url_queue
-#                self._doc_id_cache
-#                self._word_id_cache
-#                #lizwang
-#                self._inverted_index
-#                self._resolved_inverted_index
-#                self._inverted_doc_id_cache
-#                self._inverted_word_id_cache
-#                #lizwang: store url description
-#                self._url_description
-#                self._links
-#                self._inverted_index
-
                 self._curr_depth = depth_ + 1
                 self._curr_url = url
                 self._curr_doc_id = doc_id
@@ -455,10 +449,8 @@ class crawler(object):
                 self._curr_words = [ ]
                 self._index_document(soup)
                 self._add_words_to_document()
-#                print "    url="+repr(self._curr_url)
 
             except Exception as e:
-#                print e
                 pass
             finally:
                 if socket:
@@ -467,7 +459,7 @@ class crawler(object):
 if __name__ == "__main__":
     start = time.time()
     bot = crawler(None, "urls.txt")
-    bot.crawl(depth=1)
+    bot.crawl(depth=2)
     print len(bot.get_links())
     print len(bot.get_word_id())
     print len(bot.get_inverted_index())
