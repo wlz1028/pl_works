@@ -46,7 +46,4 @@ def get_sorted_docs(doc_ids):
 def get_sorted_urls(docs):
     if not docs:
         return []
-#def get_sorted_urls():
-    #return ['taobao.com','google.ca','yahoo.com','baidu.com','amazon.com','xiami.com','apple.com','facebook.com','renren.com','qq.com','github.com']
-#    return []
     return [doc[1] for doc in docs]
