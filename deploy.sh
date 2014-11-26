@@ -58,3 +58,4 @@ cd -
 #frontEnd online
 chmod +x $basedir/frontEnd/master.sh
 $basedir/frontEnd/master.sh
+exit 1
