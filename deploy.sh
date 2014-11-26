@@ -1,6 +1,7 @@
 #!/bin/bash
 
 #install required packages
+basedir="$(dirname $0)"
 #python modules
 apt-get install python-pip
 pip install oauth2client
@@ -24,7 +25,8 @@ sudo service mongod start
 sudo apt-get install pound
 
 #backEnd autorun(indexing web and save to db)
-python ./backEnd/master.py
+python $basedir/backEnd/master.py
 
 #frontEnd online
-
+chmod +x $basedir/frontEnd/master.sh
+$basedir/frontEnd/master.sh
