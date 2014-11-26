@@ -1,0 +1,21 @@
+frontEnd:
+(3hrs)Title and sumamry(require update db)
+db donw
+guan front End
+
+backEnd:
+(10hrs)pageRank mapreduce
+
+user frendly:
+(3hrs)tablet,phone(bootstrap)
+
+deployment:
+(3hrs)load balancing: multiple cpu
+http://bottlepy.org/docs/dev/deployment.html
+
+
+One-click delpyement script:
+(5hrs)
+
+Report:
+(3hrs)

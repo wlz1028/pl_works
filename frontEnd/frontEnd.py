@@ -8,7 +8,7 @@ import httplib2
 import operator
 from beaker.middleware import SessionMiddleware
 import json
-import os,math
+import os,math,sys
 
 CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
 CLIENT_SECRET = '_5cneg88pgpKmwdOixxCOoSj'
@@ -289,11 +289,13 @@ def isLogin():
     except:
         return False
 
-#run(app, host='localhost', port=8080, debug=True)
-run(
-        app,                    # Run |app| Bottle() instance
-        host     = '0.0.0.0',
-        port     = 8080,
-        reloader = True,        # restarts the server every time edit a module file
-#        debug    = True         # Comment out it before deploy
-        )
+def main(_port):
+    run(
+            app,                    # Run |app| Bottle() instance
+            host     = '127.0.0.1',
+            port     = _port,
+            reloader = True,        # restarts the server every time edit a module file
+            )
+
+if __name__ == "__main__":
+    main(sys.argv[1])

@@ -294,7 +294,7 @@ class crawler(object):
         into the self._curr_words list for later processing."""
         words = WORD_SEPARATORS.split(elem.string.lower())
         #lizwang add description  and text len is controled by DESCRIPTION_LEN
-        sentence = " ".join(" ".join(words).split())
+        sentence = " ".join(" ".join(w for w in words if w not in self._ignored_words).split())
         if self._desc_word_count < DESCRIPTION_LEN:
             if len(sentence) <= DESCRIPTION_LEN - self._desc_word_count:
                 self._url_description[self._curr_doc_id]["description"] += sentence
