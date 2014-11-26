@@ -53,7 +53,8 @@ _EOF
 
 echo "startup=1" > /etc/default/pound
 
-/etc/init.d/pound restart
+/etc/init.d/pound stop
+/etc/init.d/pound start
 
 #backEnd autorun(indexing web and save to db)
 cd backEnd
