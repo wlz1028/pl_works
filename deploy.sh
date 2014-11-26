@@ -4,7 +4,7 @@
 basedir="$(dirname $0)"
 #python modules
 apt-get update
-apt-get install python-pip
+apt-get install -y python-pip
 pip install oauth2client
 pip install --upgrade google-api-python-client
 pip install beaker
@@ -16,15 +16,22 @@ pip install tornado
 
 #mongodb
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
+sleep 1
 echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | sudo tee /etc/apt/sources.list.d/mongodb.list
+sleep 1
 apt-get update
+sleep 1
 apt-get install -y mongodb-org
+sleep 1
 #start deamon
 service mongod stop
+sleep 1
 service mongod start
+sleep 1
 
 #packages
-apt-get install pound
+apt-get install -y pound
+sleep 1
 
 cat > /etc/pound/pound.cfg << '_EOF'
 User        "www-data"
@@ -51,16 +58,26 @@ ListenHTTP
     End
 End
 _EOF
+sleep 1
 
 echo "startup=1" > /etc/default/pound
 
 /etc/init.d/pound stop
+sleep 1
 /etc/init.d/pound start
+sleep 1
+
+ps -a | grep mongo | grep -v mongo
+if ( $? == 1  ); then
+service mongod start
+fi
+
 
 #backEnd autorun(indexing web and save to db)
 cd backEnd
 python master.py
 cd -
+sleep 1
 
 #frontEnd online
 chmod +x $basedir/frontEnd/master.sh

@@ -30,6 +30,7 @@ def main(key_file, rsa_keyfile_name, instance_id):
     while (instance[0].update() != 'terminated' or counter == 0):
         print "{}/10 Let's try agin in 5sec".format(str(counter))
         time.sleep(5)
+        counter -= 1
     print "Succesffuly terminated " + instance_id
     return True
 

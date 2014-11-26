@@ -1,5 +1,12 @@
 * Load balancer
-  * Use tornado in frontend server(async server, very fast, facebook also use it)
-  * start two bottle apps at 8081 8082 ports
-  * use pound to load balance. Traffic to port:80 will be assigned to either 8081 or 8082 port
+  * start two bottle apps at 8081 8082 ports(also tested on launching 4 bottle apps on 4 different ports. Almost no improvement, becasue performance is limited by aws server hardware configs)
+  * use pound to load balance. Traffic to port:80 will be randomly assigned to either 8081 or 8082 port
+  * backend server comparison
+    * Use tornado in frontend server(async server, very fast, facebook also use it)
+    * Use default multithread server
+    * using "ab" to send concurrent connection
+    * Tonado and multithread server doesn't have significant difference
+    * result: 4000 concurrent connection on page without database
+              3000 concurrent connection on query page(with mongodb)
+              see rpts/connection_test.txt
   * see deloy.sh for pound config setting

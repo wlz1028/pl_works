@@ -10,12 +10,18 @@ user frendly:
 (3hrs)tablet,phone(bootstrap)
 
 deployment:
-(3hrs)load balancing: multiple cpu
-http://bottlepy.org/docs/dev/deployment.html
+(3hrs)done load balancing: multiple cpu http://bottlepy.org/docs/dev/deployment.html
+4000 connection done
 
 
 One-click delpyement script:
-(5hrs)
+(5hrs) done
 
 Report:
 (3hrs)
+
+
+question:
+assignment
+  * map reduce function multi variable
+  * timmer function
