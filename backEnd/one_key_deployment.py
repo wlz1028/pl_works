@@ -35,14 +35,14 @@ def main(key_file, rsa_keyfile_name):
         print('Instance status: ' + status)
         return
 
-    copy_file_cmd = '''yes | ssh -i {}.pem ubuntu@{} "rm -rf pl_works && sudo apt-get install git &&git clone https://github.com/wlz1028/pl_works.git"'''.format(rsa_keyfile_name, pub_ip)
+    copy_file_cmd = '''ssh -i {}.pem ubuntu@{} "rm -rf pl_works && yes | sudo apt-get install git && git clone https://github.com/wlz1028/pl_works.git"'''.format(rsa_keyfile_name, pub_ip)
     print "Downlaoding source code to instance"
-    print "executing "+ copy_file_cmd
+    print "executing -> "+ copy_file_cmd
     os.system(copy_file_cmd)
 
     print "Run deploy script"
-    deploy_cmd = '''ssh -i {}.pem ubuntu@{} "cd pl_works && chmod +x deploy.sh && sudo yes | ./deploy.sh" '''.format(rsa_keyfile_name, pub_ip)
-    print "executing "+ deploy_cmd
+    deploy_cmd = '''ssh -i {}.pem ubuntu@{} "cd pl_works && chmod +x deploy.sh && sudo ./deploy.sh" '''.format(rsa_keyfile_name, pub_ip)
+    print "executing -> "+ deploy_cmd
     os.system(deploy_cmd)
 
 if __name__ == "__main__":
