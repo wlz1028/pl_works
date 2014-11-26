@@ -2,17 +2,6 @@
 
 #install required packages
 basedir="$(dirname $0)"
-#python modules
-apt-get update
-apt-get install -y python-pip
-pip install oauth2client
-pip install --upgrade google-api-python-client
-pip install beaker
-pip install pymongo
-apt-get install -y python-numpy
-pip install bottle
-pip install BeautifulSoup
-pip install tornado
 
 #mongodb
 apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10
@@ -28,6 +17,27 @@ service mongod stop
 sleep 1
 service mongod start
 sleep 1
+
+#python modules
+apt-get install -y python-pip
+sleep 1
+pip install oauth2client
+sleep 1
+pip install --upgrade google-api-python-client
+sleep 1
+pip install beaker
+sleep 1
+pip install pymongo
+sleep 1
+apt-get install -y python-numpy
+sleep 1
+pip install bottle
+sleep 1
+pip install BeautifulSoup
+sleep 1
+pip install tornado
+sleep 1
+
 
 #packages
 apt-get install -y pound
