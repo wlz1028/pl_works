@@ -40,7 +40,11 @@ ListenHTTP
     Service
         BackEnd
             Address 127.0.0.1
-            Port    8080
+            Port    8081
+        End
+        BackEnd
+            Address 127.0.0.1
+            Port    8082
         End
     End
 End
