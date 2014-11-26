@@ -20,6 +20,7 @@ echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | 
 apt-get update
 apt-get install -y mongodb-org
 #start deamon
+service mongod stop
 service mongod start
 
 #packages
