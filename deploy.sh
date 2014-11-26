@@ -3,6 +3,7 @@
 #install required packages
 basedir="$(dirname $0)"
 #python modules
+apt-get update
 apt-get install python-pip
 pip install oauth2client
 pip install --upgrade google-api-python-client
