@@ -50,6 +50,7 @@ def main(key_file, rsa_keyfile_name):
         print('Instance status: ' + status)
         return
 
+    #TODO: keep this
     print "Wait 5 mins until instance is stable"
 #    time.sleep(60*5)
 
@@ -63,9 +64,11 @@ def main(key_file, rsa_keyfile_name):
     print "executing -> "+ deploy_cmd
     os.system(deploy_cmd)
 
+    print('New instance "' + instance.id + '" accessible at ' + instance.public_dns_name + " DNS/IP: " + pub_dns + "/" + pub_ip )
     return (instance_id, pub_dns, pub_ip)
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print "Help: arg1=key file, arg2=rsa_keyfile_name"
+    #TODO: fix argv
     main(sys.argv[1], sys.argv[2])

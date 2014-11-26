@@ -9,7 +9,7 @@ pip install oauth2client
 pip install --upgrade google-api-python-client
 pip install beaker
 pip install pymongo
-apt-get install python-numpy
+apt-get install -y python-numpy
 pip install bottle
 pip install BeautifulSoup
 pip install tornado
@@ -68,10 +68,6 @@ sleep 1
 sleep 1
 
 ps -a | grep mongo | grep -v mongo
-if ( $? == 1  ); then
-service mongod start
-fi
-
 
 #backEnd autorun(indexing web and save to db)
 cd backEnd

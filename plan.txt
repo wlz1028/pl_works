@@ -10,6 +10,7 @@ user frendly:
 (3hrs)tablet,phone(bootstrap)
 
 deployment:
+#TODO: fix cmdline and create new rsa
 (3hrs)done load balancing: multiple cpu http://bottlepy.org/docs/dev/deployment.html
 4000 connection done
 
