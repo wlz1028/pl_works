@@ -40,6 +40,11 @@ def main(key_file, rsa_keyfile_name):
     print "executing "+ copy_file_cmd
     os.system(copy_file_cmd)
 
+    print "Run deploy script"
+    deploy_cmd = '''ssh -i {}.pem ubuntu@{} "cd pl_works && chmod +x deploy.sh && sudo ./deploy.sh" '''.format(rsa_keyfile_name, pub_ip)
+    print "executing "+ deploy_cmd
+    os.system(deploy)
+
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print "Help: arg1=key file, arg2=rsa_keyfile_name"
