@@ -17,20 +17,32 @@ import sys,json,time,os
 5. User accesses the search engine service through the returned IP address or public
 DNS from browser
 """
-def main(key_file, rsa_keyfile_name):
-    try:
-        with open(key_file+".json") as f:
-            ckey = json.load(f)
-    except:
-        raise Exception("Invalid key file")
-
+def main(AKEY, SKEY):
     conn = boto.ec2.connect_to_region("us-east-1",
-                                    aws_access_key_id=ckey['AKEY'],
-                                    aws_secret_access_key=ckey['SKEY'])
+                                    aws_access_key_id=AKEY,
+                                    aws_secret_access_key=SKEY)
+
+    try:
+        kp = conn.create_key_pair("csc326_group18")
+        kp.save('.')
+    except:
+        print "Key is alreay created"
+        pass
+
+    try:
+        web = conn.create_security_group('csc326-group18_1', 'csc326-group18_1')
+        web.authorize('ICMP', -1, -1, '0.0.0.0/0')
+        web.authorize('TCP', 80, 80, '0.0.0.0/0')
+        web.authorize('TCP', 8080, 8080, '0.0.0.0/0')
+        web.authorize('TCP', 22, 22, '0.0.0.0/0')
+    except:
+        print "Group is already created"
+
     reservation = conn.run_instances('ami-9aaa1cf2',
-                key_name=rsa_keyfile_name,
+                key_name="csc326_group18",
                 instance_type='t2.micro',
-                security_groups=['csc326-group18'])
+                security_groups=['csc326-group18_1'])
+
 
     instance = reservation.instances[0]
     print('Waiting for instance to start...')
@@ -40,7 +52,7 @@ def main(key_file, rsa_keyfile_name):
         print "Not yet, Check status again after 30secs"
         time.sleep(30)
         status = instance.update()
-    time.sleep(30)
+    time.sleep(20)
     if status == 'running':
         instance_id = instance.id
         pub_dns = instance.public_dns_name
@@ -54,13 +66,13 @@ def main(key_file, rsa_keyfile_name):
     print "Wait 5 mins until instance is stable"
 #    time.sleep(60*5)
 
-    copy_file_cmd = '''ssh -i {}.pem ubuntu@{} "rm -rf pl_works && yes | sudo apt-get install git && git clone https://github.com/wlz1028/pl_works.git"'''.format(rsa_keyfile_name, pub_ip)
+    copy_file_cmd = '''ssh -i {}.pem ubuntu@{} "rm -rf pl_works && yes | sudo apt-get install git && git clone https://github.com/wlz1028/pl_works.git"'''.format("csc326_group18", pub_ip)
     print "Downlaoding source code to instance"
     print "executing -> "+ copy_file_cmd
     os.system(copy_file_cmd)
 
     print "Run deploy script"
-    deploy_cmd = '''ssh -i {}.pem ubuntu@{} "cd pl_works && chmod +x deploy.sh && sudo ./deploy.sh" '''.format(rsa_keyfile_name, pub_ip)
+    deploy_cmd = '''ssh -i {}.pem ubuntu@{} "cd pl_works && chmod +x deploy.sh && sudo ./deploy.sh" '''.format("csc326_group18", pub_ip)
     print "executing -> "+ deploy_cmd
     os.system(deploy_cmd)
 
@@ -69,6 +81,6 @@ def main(key_file, rsa_keyfile_name):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print "Help: arg1=key file, arg2=rsa_keyfile_name"
+        print "Help: arg1=access key, arg2=secret key"
     #TODO: fix argv
     main(sys.argv[1], sys.argv[2])

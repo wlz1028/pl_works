@@ -14,21 +14,15 @@ import sys,json,time,os
     * Retrun True
 """
 
-def main(key_file, rsa_keyfile_name, instance_id):
-    try:
-        with open(key_file+".json") as f:
-            ckey = json.load(f)
-    except:
-        raise Exception("Invalid key file")
-
+def main(AKEY, SKEY, instance_id):
     conn = boto.ec2.connect_to_region("us-east-1",
-                                    aws_access_key_id=ckey['AKEY'],
-                                    aws_secret_access_key=ckey['SKEY'])
+                                    aws_access_key_id=AKEY,
+                                    aws_secret_access_key=SKEY)
     print "Prepare terminate " + instance_id
     instance = conn.terminate_instances(instance_ids=[instance_id])
     counter = 10
     while (instance[0].update() != 'terminated' or counter == 0):
-        print "{}/10 Let's try agin in 5sec".format(str(counter))
+        print "{}/10 Let's check again in 5sec".format(str(counter))
         time.sleep(5)
         counter -= 1
     print "Succesffuly terminated " + instance_id
@@ -36,5 +30,5 @@ def main(key_file, rsa_keyfile_name, instance_id):
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print "Help: arg1=key file, arg2=rsa_keyfile_name"
+        print "Help: arg1=Access key, arg2=secret key, arg3:instence_id"
     main(sys.argv[1], sys.argv[2], sys.argv[3])
