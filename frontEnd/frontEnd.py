@@ -44,6 +44,8 @@ def search():
 
 @post('/search')
 def do_search():
+    if not request.forms.get('keywords'):
+        redirect("/search")
     #replace white space with %20
     q = "%20".join(request.forms.get('keywords').split())
     redirect('/result/{}/{}'.format(q,1))
@@ -76,6 +78,21 @@ def result(q, p=1):
     doc_ids = get_doc_ids(word_id)
     sorted_doc_ids = get_sorted_docs(doc_ids)
     sorted_url = get_sorted_urls(sorted_doc_ids)
+    #TODO: REMOVE
+    sorted_url = [{'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'yahoo.com', 'description': 'This page includes mocamocamoca zai guang hua de di ban shang mo ca', 'title':'yahoo main page'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'},
+                  {'url': 'google.com', 'description': 'im google haha', 'title':'Google main'}]
     print sorted_url
     page = int(p)
     print page
@@ -272,9 +289,9 @@ def getUserDisplay():
     """
     user_info = request.environ.get('beaker.session')
     try:
-        display = user_info['email'] + ' <a href="/logout">logout</a><br>'
+        display ='<a href="/logout">{} logout</a>'.format(user_info['email'])
     except:
-        display = 'Anonymous can <a href="/login">login</a><br>'
+        display = '<a href="/login">login</a>'
     return display
 
 def isLogin():
@@ -295,6 +312,7 @@ def main(_port):
             host     = '127.0.0.1',
             port     = _port,
             reloader = True,        # restarts the server every time edit a module file
+            debug = True
             )
 
 if __name__ == "__main__":
