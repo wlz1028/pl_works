@@ -54,6 +54,9 @@
         %if correction != KEYSTRING:
         <p style="color:orange">Did you mean: <a href="/result/{{new_search}}/1" style="color:navy">{{correction}}</a></p>
         %end
+        %if not URLS:
+        <h2>Results for "{{KEYSTRING}}" not found</h2>
+        %else:
         <h2>Search for "{{KEYSTRING}}"</h2>
         <table id="results">
         %total = int(math.ceil(len(URLS)/10.0))
@@ -93,6 +96,7 @@
             %end
             %end
         </ul>
+        %end
 
       <footer>
         <p style="font-size:90%">&copy; 2014 Summer&Edward</p>

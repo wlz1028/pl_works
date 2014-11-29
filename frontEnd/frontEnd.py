@@ -75,9 +75,6 @@ def result(q, p=1):
 
     if page > math.ceil(len(sorted_docs)/float(10)) and page!=1:
         return error404(404)
-    if not sorted_docs:
-        message = '"{}" Cannot be found'.format(keyString)
-        return template('error',ERRORMESSAGE=message)
 
     return template('result', KEYSTRING=keyString, URLS=sorted_docs, PAGE_NUMBER=page, PREVIOUS=previous, NEXT=nextpage, USER_DISPLAY=getUserDisplay(),QUERY=q)
 
