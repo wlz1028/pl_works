@@ -1,6 +1,6 @@
 <html>
     <head>
-        <link REL="StyleSheet" TYPE="text/css" HREF="mystyle.css">
+        <link REL="StyleSheet" TYPE="text/css" HREF="myStyle.css">
     </head>
 
     <body>
