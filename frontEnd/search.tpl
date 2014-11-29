@@ -1,6 +1,6 @@
 <html>
     <head>
-        <link REL="StyleSheet" TYPE="text/css" HREF="myStyle.css">
+        <link REL="StyleSheet" TYPE="text/css" HREF="mystyle.css">
     </head>
 
     <body>
@@ -10,7 +10,7 @@
 
     <form action="/search" method="post">
     Hit Please: <input name="keywords" type="text"/>
-    <input value="GO!" type="submit"/>
+    <input value="GO!" type="submit" spellcheck="true" autocomplete="on"/>
     </form>
 
     <div>

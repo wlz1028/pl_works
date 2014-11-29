@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 %import math
+%import word_correction
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,13 +10,13 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>Jumbotron Template for Bootstrap</title>
+    <title>Search for "{{KEYSTRING}}"</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
 
     <!-- Custom styles for this template -->
-    <link href="jumbotron.css" rel="stylesheet">
+    <link href="/jumbotron.css" rel="stylesheet">
   </head>
 
   <body>
@@ -28,12 +29,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#" style="font-family:Herculanum">Hit Search</a>
+          <a class="navbar-brand" href="/search" style="font-family:Herculanum">Hit Search</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <form class="navbar-form navbar-right" style="font-family:Herculanum" role="form" action="/search" method="post">
             <div class="form-group">
-              <input style = "width: 500px" type="text" name="keywords" placeholder="Search key word" class="form-control">
+              <input style = "width: 500px" type="text" name="keywords" placeholder="Search key word" class="form-control" spellcheck="true" autocomplete="on">
             </div>
             <button type="submit" class="btn btn-danger">Hit Please</button>
           </form>
@@ -44,13 +45,17 @@
       </div>
     </nav>
 
-    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <!-- Display result -->
     <div class="jumbotron">
       <div class="container">
+        <!-- Display search suggestion -->
+        %correction = word_correction.correction(KEYSTRING)
+        %new_search = "%20".join(correction.split(" "))
+        %if correction != KEYSTRING:
+        <p style="color:orange">Did you mean: <a href="/result/{{new_search}}/1" style="color:navy">{{correction}}</a></p>
+        %end
         <h2>Search for "{{KEYSTRING}}"</h2>
         <table id="results">
-    
-        %import math
         %total = int(math.ceil(len(URLS)/10.0))
         %print total
         %print total
@@ -59,7 +64,7 @@
             %url = n['url']
             %description = n['description']
         <tr>
-            <td><a href='{{title}}' target="_blank" style = "font-size:150%">{{title}}</td>
+            <td><a href="{{url}}" target="_blank" style = "font-size:150%">{{title}}</td>
         </tr>
         <tr>
             <td><p style="color:green;font-size:100%">{{url}}</p></td>
@@ -90,7 +95,7 @@
         </ul>
 
       <footer>
-        <p>&copy; Summer & Edward 2014</p>
+        <p style="font-size:90%">&copy; 2014 Summer&Edward</p>
       </footer>
       </div>
     </div>
