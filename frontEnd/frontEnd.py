@@ -9,6 +9,7 @@ import operator
 from beaker.middleware import SessionMiddleware
 import json
 import os,math,sys
+import word_correction
 
 CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
 CLIENT_SECRET = '_5cneg88pgpKmwdOixxCOoSj'
@@ -44,8 +45,10 @@ def search():
 
 @post('/search')
 def do_search():
+    if not request.forms.get('keywords'):
+        redirect("/search")
     #replace white space with %20
-    q = "%20".join(request.forms.get('keywords').split())
+    q = "%20".join(request.forms.get('keywords').strip().split())
     redirect('/result/{}/{}'.format(q,1))
 
 #@get('/result')
@@ -74,21 +77,34 @@ def result(q, p=1):
     first_word = keyString.split()[0]
     word_id = get_word_id(first_word)
     doc_ids = get_doc_ids(word_id)
-    sorted_doc_ids = get_sorted_docs(doc_ids)
-    sorted_url = get_sorted_urls(sorted_doc_ids)
-    print sorted_url
+    sorted_docs = get_sorted_docs(doc_ids)
+#    sorted_url = get_sorted_urls(sorted_doc_ids)
+    #TODO: REMOVE
+#    sorted_url = [{'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'yahoo.com', 'description': 'This page includes mocamocamoca zai guang hua de di ban shang mo ca', 'title':'yahoo main page'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
+#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'}]
     page = int(p)
-    print page
     previous = page-1
     nextpage = page+1
 
-    if page > math.ceil(len(sorted_url)/float(10)) and page!=1:
+    if page > math.ceil(len(sorted_docs)/float(10)) and page!=1:
         return error404(404)
-    if not sorted_url:
+    if not sorted_docs:
         message = '"{}" Cannot be found'.format(keyString)
         return template('error',ERRORMESSAGE=message)
 
-    return template('result', KEYSTRING=keyString, URLS=sorted_url, PAGE_NUMBER=page, PREVIOUS=previous, NEXT=nextpage, USER_DISPLAY=getUserDisplay(),QUERY=q)
+    return template('result', KEYSTRING=keyString, URLS=sorted_docs, PAGE_NUMBER=page, PREVIOUS=previous, NEXT=nextpage, USER_DISPLAY=getUserDisplay(),QUERY=q)
 
 @get('/query')
 def queryResult():
@@ -99,13 +115,6 @@ def queryResult():
         return 'Please <a href="/login">login</a> to see your search history'
     user_info = request.environ.get('beaker.session')
     return template('user_search_history', USER_DISPLAY=getUserDisplay(), QUERY=getTop20(user_info['email']))
-
-#@get('/error/<q>')
-#def general_error(q="General error"):
-#    """
-#    return error message HTML
-#    """
-#    return "Opps!!<br>Error:{}".format(q)
 
 #login page
 @route('/login', 'GET')
@@ -226,38 +235,6 @@ def get_user_history(user_email):
     else:
         return {}
 
-
-#Pretty table
-#def getTableHeader():
-#    headerFont = '''
-#           <head>
-#           <style>
-#                table {
-#                    width:20%;
-#                }
-#                table, th, td {
-#                    border-collapse: collapse;
-#                }
-#                th, td { padding: 5px;
-#                         text-align: left;
-#                }
-#                tr:nth-child(even) {
-#                    background-color: #ADBDCD;
-#                    color: white;
-#                }
-#                tr:nth-child(odd) {
-#                    background-color: #7F98B2;
-#                    color: white;
-#                }
-#                th {
-#                    background-color:#4D7094;
-#                    color: white;
-#                }
-#           </style>
-#           </head>
-#    '''
-#    return headerFont
-
 def getTop20(user_email):
     """
     return user top 20 word count history
@@ -272,9 +249,9 @@ def getUserDisplay():
     """
     user_info = request.environ.get('beaker.session')
     try:
-        display = user_info['email'] + ' <a href="/logout">logout</a><br>'
+        display ='<a href="/logout">{} logout</a>'.format(user_info['email'])
     except:
-        display = 'Anonymous can <a href="/login">login</a><br>'
+        display = '<a href="/login">login</a>'
     return display
 
 def isLogin():
@@ -295,6 +272,7 @@ def main(_port):
             host     = '127.0.0.1',
             port     = _port,
             reloader = True,        # restarts the server every time edit a module file
+            debug = True
             )
 
 if __name__ == "__main__":
