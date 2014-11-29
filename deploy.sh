@@ -80,11 +80,19 @@ sleep 1
 ps -a | grep mongo | grep -v mongo
 
 #backEnd autorun(indexing web and save to db)
+echo ''
+echo ''
+echo 'Running backend crawler and building databases'
+echo 'Please wait......'
 cd backEnd
 python master.py
 cd -
 sleep 1
 
+echo ""
+echo ""
+echo ""
+echo 'Luaching frontend'
 #frontEnd online
 chmod +x $basedir/frontEnd/master.sh
 $basedir/frontEnd/master.sh

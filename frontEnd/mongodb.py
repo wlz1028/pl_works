@@ -32,13 +32,12 @@ def get_doc_ids(word_id):
 
 def get_sorted_docs(doc_ids):
     if not doc_ids:
-        return None
+        return []
     docs = []
     try:
         for doc_id in doc_ids:
             doc = query({'_id': doc_id},'doc_id_index')
             print doc
-#            docs.append((doc['_id'], doc['url'], doc['pageRank']))
             docs.append({'_id': doc['_id'],'url': doc['url'], 'pr':doc['pageRank'],
                 'title': doc['title'], 'description': doc['description']
                 })
@@ -46,8 +45,3 @@ def get_sorted_docs(doc_ids):
         return sorted_docs
     except:
         return []
-
-def get_sorted_urls(docs):
-    if not docs:
-        return []
-    return [doc[1] for doc in docs]

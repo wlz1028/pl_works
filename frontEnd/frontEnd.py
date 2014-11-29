@@ -3,7 +3,7 @@ from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.client import flow_from_clientsecrets
 from googleapiclient.errors import HttpError
 from googleapiclient.discovery import build
-from mongodb import get_word_id,get_doc_ids,get_sorted_docs,get_sorted_urls
+from mongodb import get_word_id,get_doc_ids,get_sorted_docs
 import httplib2
 import operator
 from beaker.middleware import SessionMiddleware
@@ -78,6 +78,7 @@ def result(q, p=1):
     word_id = get_word_id(first_word)
     doc_ids = get_doc_ids(word_id)
     sorted_docs = get_sorted_docs(doc_ids)
+    print sorted_docs
 #    sorted_url = get_sorted_urls(sorted_doc_ids)
     #TODO: REMOVE
 #    sorted_url = [{'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
