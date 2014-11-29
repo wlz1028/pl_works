@@ -1,3 +1,9 @@
+##############################
+##############################
+######Query page(mongodb)#####
+##############################
+##############################
+
 lizwang-Air:lab4 lizwang$ ab -c 3000 -n 3000 http://ec2-54-85-129-223.compute-1.amazonaws.com/result/engineering/1
 This is ApacheBench, Version 2.3 <$Revision: 1554214 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
@@ -17,7 +23,7 @@ Completed 3000 requests
 Finished 3000 requests
 
 
-Server Software:        WSGIServer/0.1
+Server Software:        TornadoServer/4.0.2
 Server Hostname:        ec2-54-85-129-223.compute-1.amazonaws.com
 Server Port:            80
 
@@ -56,6 +62,11 @@ Percentage of the requests served within a certain time (ms)
  100%  28701 (longest request)
 
 
+##############################
+##############################
+######without mongoDB#########
+##############################
+##############################
 lizwang-Air:lab4 lizwang$ ab -c 4000 -n 4000 http://ec2-54-85-129-223.compute-1.amazonaws.com/t
 This is ApacheBench, Version 2.3 <$Revision: 1554214 $>
 Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
@@ -75,7 +86,7 @@ Completed 4000 requests
 Finished 4000 requests
 
 
-Server Software:        WSGIServer/0.1
+Server Software:        TornadoServer/4.0.2
 Server Hostname:        ec2-54-85-129-223.compute-1.amazonaws.com
 Server Port:            80
 

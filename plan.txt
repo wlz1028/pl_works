@@ -1,28 +1,20 @@
 frontEnd:
-(3hrs)Title and sumamry(require update db)
-db donw
-guan front End
+  * (3hrs) result page Title and descrption(require update db)
+  * (3hrs)tablet,phone(bootstrap) friendly
 
 backEnd:
-(10hrs)pageRank mapreduce
-
-user frendly:
-(3hrs)tablet,phone(bootstrap)
+  (20hrs)pageRank mapreduce
+  * Research 5 hrs
+  * Mapper/reducer 5 hrs
+  * CLI testing 2 hrs
+  * hadoop 8 hrs
 
 deployment:
-#TODO: fix cmdline and create new rsa
-(3hrs)done load balancing: multiple cpu http://bottlepy.org/docs/dev/deployment.html
-4000 connection done
-
-
-One-click delpyement script:
-(5hrs) done
+  * (3hrs)load balancing (pound) and multiple bottle apps on multiple cores
+  http://bottlepy.org/docs/dev/deployment.html
+  * (3hrs) One-click delpyement script:
 
 Report:
-(3hrs)
+(5hours)
 
-
-question:
-assignment
-  * map reduce function multi variable
-  * timmer function
+Total: about 50 hours in one week
