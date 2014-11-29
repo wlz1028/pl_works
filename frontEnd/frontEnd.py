@@ -13,7 +13,7 @@ import word_correction
 
 CLIENT_ID = '395936545769-jd8er08m6pl0hk8up931qk7r6o45077s.apps.googleusercontent.com'
 CLIENT_SECRET = 'b4ZMzDLcMNO8aqnukBoYCrii'
-REDIRECT_URI = 'http://ec2-54-174-141-227.compute-1.amazonaws.com/redirect'
+REDIRECT_URI = 'http://ec2-54-174-141-227.compute-1.amazonaws.com:80/redirect'
 SCOPE = 'https://www.googleapis.com/auth/userinfo.email'
 
 USER_HISTORY_PATH = './data/user_word_count_history.json'
