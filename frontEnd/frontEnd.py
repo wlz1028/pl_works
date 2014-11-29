@@ -11,9 +11,9 @@ import json
 import os,math,sys
 import word_correction
 
-CLIENT_ID = '395936545769-71fnqj77gtni1vflk366qv41e345jf6e.apps.googleusercontent.com'
-CLIENT_SECRET = '_5cneg88pgpKmwdOixxCOoSj'
-REDIRECT_URI = 'http://ec2-54-86-113-124.compute-1.amazonaws.com:8080/redirect'
+CLIENT_ID = '395936545769-jd8er08m6pl0hk8up931qk7r6o45077s.apps.googleusercontent.com'
+CLIENT_SECRET = 'b4ZMzDLcMNO8aqnukBoYCrii'
+REDIRECT_URI = 'http://ec2-54-174-141-227.compute-1.amazonaws.com/redirect'
 SCOPE = 'https://www.googleapis.com/auth/userinfo.email'
 
 USER_HISTORY_PATH = './data/user_word_count_history.json'
@@ -51,19 +51,10 @@ def do_search():
     q = "%20".join(request.forms.get('keywords').strip().split())
     redirect('/result/{}/{}'.format(q,1))
 
-#@get('/result')
-#def result(q):
-#    """
-#    return search result HTML
-#    """
-#    return "please enter something"
-
 @get('/test')
 def test():
     message = '\"{}\"Cannot be found'.format(keyString)
     return template('error',ERRORMESSAGE=message)
-
-
 
 @get('/result/<q>/<p>')
 def result(q, p=1):
@@ -78,23 +69,6 @@ def result(q, p=1):
     word_id = get_word_id(first_word)
     doc_ids = get_doc_ids(word_id)
     sorted_docs = get_sorted_docs(doc_ids)
-    print sorted_docs
-#    sorted_url = get_sorted_urls(sorted_doc_ids)
-    #TODO: REMOVE
-#    sorted_url = [{'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'yahoo.com', 'description': 'This page includes mocamocamoca zai guang hua de di ban shang mo ca', 'title':'yahoo main page'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'},
-#                  {'url': 'http://google.com', 'description': 'im google haha', 'title':'Google main'}]
     page = int(p)
     previous = page-1
     nextpage = page+1
