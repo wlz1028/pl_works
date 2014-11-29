@@ -37,8 +37,12 @@ def get_sorted_docs(doc_ids):
     try:
         for doc_id in doc_ids:
             doc = query({'_id': doc_id},'doc_id_index')
-            docs.append((doc['_id'], doc['url'], doc['pageRank']))
-        sorted_docs = sorted(docs, key=operator.itemgetter(2),reverse=True)
+            print doc
+#            docs.append((doc['_id'], doc['url'], doc['pageRank']))
+            docs.append({'_id': doc['_id'],'url': doc['url'], 'pr':doc['pageRank'],
+                'title': doc['title'], 'description': doc['description']
+                })
+        sorted_docs = sorted(docs, key=lambda x: x['pr'],reverse=True)
         return sorted_docs
     except:
         return []
