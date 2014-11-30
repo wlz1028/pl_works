@@ -26,8 +26,7 @@ def main(AKEY, SKEY):
         kp = conn.create_key_pair("csc326_group18")
         kp.save('.')
     except:
-        print "Key is alreay created"
-        pass
+        raise Exception("Key already exist!! Please remove key pairs csc326_group18 from aws, and remove local csc326_group18.pem, then try this script again")
 
     #create security group
     try:
