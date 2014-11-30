@@ -40,6 +40,9 @@ Code structure:
       pg_reducer.py
       pg_reducer_generator.py
 
+public DNS/IP:
+  TODO:
+
 How to deploy a new website:
 > cd backEnd
 > python one_key_deployment.py ACCESS_KEY SECRETE_KEY

@@ -1,4 +1,3 @@
-import boto.ec2
 import sys,json,time,os
 
 """
@@ -17,6 +16,7 @@ import sys,json,time,os
 DNS from browser
 """
 def main(AKEY, SKEY):
+    import boto.ec2
     conn = boto.ec2.connect_to_region("us-east-1",
                                     aws_access_key_id=AKEY,
                                     aws_secret_access_key=SKEY)
@@ -84,6 +84,7 @@ def main(AKEY, SKEY):
     return (instance_id, pub_dns, pub_ip)
 
 if __name__ == "__main__":
+    os.system("chmod +x boto.sh && ./boto.sh")
     if len(sys.argv) != 3:
         print "Help: arg1=access key, arg2=secret key"
     main(sys.argv[1], sys.argv[2])
