@@ -3,12 +3,11 @@ import sys,json,time,os
 
 """
 1. User specifies AWS credentials in a separate key file;
-    * key_file.json contains aws keys
-    * csc326_group18.pem is the ras key to connect instance
+    arg1=ACCESS_KEY arg2=SECRETE_KEY arg3=INSTANCE_ID
 2. User invokes termination script and pass the instance ID from command line;
-    * python one_key_terminate.py key_file csc326_group18 $ID
+    * python one_key_terminate.py arg1=ACCESS_KEY arg2=SECRETE_KEY arg3=INSTANCE_ID
 3. Termination script shuts down AWS instance.
-    * It may faile to terminate, and retry after 5 secs
+    * handle by script
 4. Upon completion, the termination script returns message indicating whether the termination process has been completed successfully.
     * Print successful message at the end
     * Retrun True
@@ -22,8 +21,8 @@ def main(AKEY, SKEY, instance_id):
     instance = conn.terminate_instances(instance_ids=[instance_id])
     counter = 10
     while (instance[0].update() != 'terminated' or counter == 0):
-        print "{}/10 Let's check again in 5sec".format(str(counter))
-        time.sleep(5)
+        print "{}/10 Let's check again in 10sec".format(str(counter))
+        time.sleep(10)
         counter -= 1
     print "Succesffuly terminated " + instance_id
     return True

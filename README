@@ -1,12 +1,55 @@
-* Load balancer
-  * start two bottle apps at 8081 8082 ports(also tested on launching 4 bottle apps on 4 different ports. Almost no improvement, becasue performance is limited by aws server hardware configs)
-  * use pound to load balance. Traffic to port:80 will be randomly assigned to either 8081 or 8082 port
-  * backend server comparison
-    * Use tornado in frontend server(async server, very fast, facebook also use it)
-    * Use default multithread server
-    * using "ab" to send concurrent connection
-    * Tonado and multithread server doesn't have significant difference
-    * result: 4000 concurrent connection on page without database
-              3000 concurrent connection on query page(with mongodb)
-              see rpts/connection_test.txt
-  * see deloy.sh for pound config setting
+Code structure:
+  - backEnd/    #backEnd source code
+  - deploy.sh   #deploy.sh auto run on aws
+  - frontEnd/   #frontEnd source code
+  - rpts/       #reports
+
+  frontEnd/
+      frontEnd.py #bottle application
+      mongodb.py  #query mongodb and mongodb api
+      word_correction.py #word_correction api
+      dictionary.txt #auto correction dictionary
+      *tpl #bottle templates
+      *css #css files
+
+  backEnd/
+      crawler.py  #single thread crawler
+      crawler_multi_Thread.py #multithread cralwer
+      unit_test.py #tester for cralwer and mongodb
+      master.py #auto crawl and build mongodb
+      one_key_deployment.py #launch new aws instance and deploy website
+      one_key_terminate.py  #termiate a instance by id
+      pagerank.py #pagerank api
+      test.html #test html for cralwer
+      urls.txt  #list of urls to be crawl
+      write_mongo.py  #mongodb insertion api
+
+  #Please see report for more details
+  pagerank_mapreduce/
+      #input data files
+      cbc_pr.txt
+      pagerank.txt
+
+      #mapper and reducer
+      pg_mapper.py
+      pg_mapper_generator.py
+      #bash script to iterate mapreuce
+      MR_iteration.sh
+
+      #imprived mapper and reducer
+      pg_reducer.py
+      pg_reducer_generator.py
+
+How to deploy a new website:
+> cd backEnd
+> python one_key_deployment.py ACCESS_KEY SECRETE_KEY
+Note: use port 80 instead of 8080
+
+How to terminate a instance:
+> cd backEnd
+> python one_key_terminate.py  ACCESS_KEY SECRETE_KEY INSTANCE_ID
+
+Final report:
+rpts/group18_­csc326­2014.pdf
+
+

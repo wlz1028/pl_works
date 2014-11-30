@@ -114,7 +114,6 @@ class crawler(object):
             'u', 'v', 'w', 'x', 'y', 'z', 'and', 'or',
         ])
 
-        # TODO remove me in real version
         self._mock_next_doc_id = 1
         self._mock_next_word_id = 1
 
@@ -133,7 +132,6 @@ class crawler(object):
         except IOError:
             pass
     
-    # TODO remove me in real version
     def _mock_insert_document(self, url):
         """A function that pretends to insert a url into a document db table
         and then returns that newly inserted document's id."""
@@ -141,7 +139,6 @@ class crawler(object):
         self._mock_next_doc_id += 1
         return ret_id
     
-    # TODO remove me in real version
     def _mock_insert_word(self, word):
         """A function that pretends to inster a word into the lexicon db table
         and then returns that newly inserted word's id."""
@@ -154,10 +151,6 @@ class crawler(object):
         if word in self._word_id_cache:
             return self._word_id_cache[word]
         
-        # TODO: 1) add the word to the lexicon, if that fails, then the
-        #          word is in the lexicon
-        #       2) query the lexicon for the id assigned to this word, 
-        #          store it in the word id cache, and return the id.
 
         word_id = self._mock_insert_word(word)
         self._word_id_cache[word] = word_id
@@ -174,21 +167,10 @@ class crawler(object):
         """Get the document id for some url."""
         if url in self._doc_id_cache:
             return self._doc_id_cache[url]
-        
-        # TODO: just like word id cache, but for documents. if the document
-        #       doesn't exist in the db then only insert the url and leave
-        #       the rest to their defaults.
-        
+
         doc_id = self._mock_insert_document(url)
         self._doc_id_cache[url] = doc_id
         return doc_id
-
-#    #lizwang
-#    def get_inverted_doc_id(self):
-#        result = {}
-#        for url, _id in self._doc_id_cache.items():
-#            result[_id] = url
-#        return result
 
     #lizwang
     def get_document_id(self):
@@ -206,7 +188,7 @@ class crawler(object):
         for k,v in self._doc_id_cache.iteritems():
             self._inverted_doc_id_cache[v] = k
 
-    
+
     def _fix_url(self, curr_url, rel):
         """Given a url and either something relative to that url or another url,
         get a properly parsed url."""
@@ -229,21 +211,13 @@ class crawler(object):
     def _visit_title(self, elem):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
-#        print "document title="+ repr(title_text)
         if not self._url_description[self._curr_doc_id]["title"]:
             self._url_description[self._curr_doc_id]["title"] = title_text
 
-        # TODO update document title for document id self._curr_doc_id
-    
+
     def _visit_a(self, elem):
         """Called when visiting <a> tags."""
-
         dest_url = self._fix_url(self._curr_url, attr(elem,"href"))
-
-        #print "href="+repr(dest_url), \
-        #      "title="+repr(attr(elem,"title")), \
-        #      "alt="+repr(attr(elem,"alt")), \
-        #      "text="+repr(self._text_of(elem))
 
         # add the just found URL to the url queue
         self._url_queue.append((dest_url, self._curr_depth))
@@ -252,13 +226,8 @@ class crawler(object):
         # other document
         self.add_link(self._curr_doc_id, self.document_id(dest_url))
 
-        # TODO add title/alt/text to index for destination url
     
     def _add_words_to_document(self):
-        # TODO: knowing self._curr_doc_id and the list of all words and their
-        #       font sizes (in self._curr_words), add all the words into the
-        #       database for this document
-#        print "    num words="+ str(len(self._curr_words))
         #lizwang
         for word_id_tuple in self._curr_words:
             word_id = word_id_tuple[0]
@@ -266,15 +235,12 @@ class crawler(object):
                 self._inverted_index[word_id] = set()
             self._inverted_index[word_id].add(self._curr_doc_id)
 
-    #lizwang
     def get_inverted_index(self):
         return self._inverted_index
 
-    #lizwang
     def get_url_description(self):
         return self._url_description
 
-    #lizwang
     def get_resovled_inverted_index(self):
         for word_id,doc_id_table in self._inverted_index.iteritems():
             word = self._inverted_word_id_cache[word_id]
@@ -433,7 +399,6 @@ class crawler(object):
     ##############################################
     ##############################################
     def crawlThread(self, url, doc_id, depth_, timeout):
-#        print "******depth = ",depth_
         socket = None
         try:
             socket = urllib2.urlopen(url, timeout=timeout)
