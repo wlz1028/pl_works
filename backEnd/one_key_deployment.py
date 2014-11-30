@@ -63,8 +63,18 @@ def main(AKEY, SKEY):
         print('Instance status: ' + status)
         return
 
-    print "Wait 5 mins until instance is stable"
-    time.sleep(60*5)
+    #Lets make sure server can be connect
+    connect = 1
+    connect_cmd = '''ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i {}.pem ubuntu@{} "ls" '''.format("csc326_group18", pub_ip)
+    while connect:
+        connect = os.system(connect_cmd)
+        if connect:
+            print "Server is not stable, lets try in 30 secs"
+            time.sleep(30)
+
+    print "------------------------------------"
+    print "Server is ready"
+    time.sleep(5)
 
     #Download code to AWS
     copy_file_cmd = '''ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i {}.pem ubuntu@{} "rm -rf pl_works && sudo apt-get update && sudo apt-get -y install git && git clone https://github.com/wlz1028/pl_works.git"'''.format("csc326_group18", pub_ip)
