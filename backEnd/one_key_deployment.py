@@ -85,6 +85,7 @@ def main(AKEY, SKEY):
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print "Help: arg1=access key, arg2=secret key"
+        raise Exception("bad input please see above help message")
     try:
         import boto.ec2
     except:
