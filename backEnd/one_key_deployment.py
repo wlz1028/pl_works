@@ -83,10 +83,10 @@ def main(AKEY, SKEY):
     return (instance_id, pub_dns, pub_ip)
 
 if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print "Help: arg1=access key, arg2=secret key"
     try:
         import boto.ec2
     except:
         os.system("chmod +x boto.sh && ./boto.sh")
-    if len(sys.argv) != 3:
-        print "Help: arg1=access key, arg2=secret key"
     main(sys.argv[1], sys.argv[2])
