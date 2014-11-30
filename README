@@ -40,7 +40,7 @@ Code structure:
       pg_reducer.py
       pg_reducer_generator.py
 
-public DNS/IP:
+Public DNS/IP:
   TODO:
 
 How to deploy a new website:
@@ -54,5 +54,3 @@ How to terminate a instance:
 
 Final report:
 rpts/group18_­csc326­2014.pdf
-
-

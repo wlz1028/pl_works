@@ -241,6 +241,7 @@ def isLogin():
 def main(_port):
     run(
             app,                    # Run |app| Bottle() instance
+            server = 'tornado',
             host     = '127.0.0.1',
             port     = _port,
             reloader = True,        # restarts the server every time edit a module file
