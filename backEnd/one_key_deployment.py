@@ -101,4 +101,5 @@ if __name__ == "__main__":
         import boto.ec2
     except:
         os.system("chmod +x boto.sh && ./boto.sh")
+        raise Exception("You just installed boto, please run this script again")
     main(sys.argv[1], sys.argv[2])
