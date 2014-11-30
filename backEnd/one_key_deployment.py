@@ -66,6 +66,7 @@ def main(AKEY, SKEY):
     #Lets make sure server can be connect
     connect = 1
     connect_cmd = '''ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i {}.pem ubuntu@{} "ls" '''.format("csc326_group18", pub_ip)
+    print "Lets try to ssh server"
     while connect:
         connect = os.system(connect_cmd)
         if connect:
