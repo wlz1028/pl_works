@@ -52,7 +52,6 @@ def main(AKEY, SKEY):
         print "Not yet, Check status again after 30secs"
         time.sleep(30)
         status = instance.update()
-    time.sleep(20)
     if status == 'running':
         instance_id = instance.id
         pub_dns = instance.public_dns_name
@@ -64,19 +63,23 @@ def main(AKEY, SKEY):
 
     #TODO: keep this
     print "Wait 5 mins until instance is stable"
-#    time.sleep(60*5)
+    time.sleep(60*5)
 
-    copy_file_cmd = '''ssh -i {}.pem ubuntu@{} "rm -rf pl_works && yes | sudo apt-get install git && git clone https://github.com/wlz1028/pl_works.git"'''.format("csc326_group18", pub_ip)
+#    first_ssh = '''ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i {}.pem ubuntu@{} "ls" '''.format("csc326_group18", pub_ip)
+#    os.system(first_ssh)
+
+    copy_file_cmd = '''ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i {}.pem ubuntu@{} "rm -rf pl_works && sudo apt-get update && sudo apt-get -y install git && git clone https://github.com/wlz1028/pl_works.git"'''.format("csc326_group18", pub_ip)
     print "Downlaoding source code to instance"
     print "executing -> "+ copy_file_cmd
     os.system(copy_file_cmd)
 
     print "Run deploy script"
-    deploy_cmd = '''ssh -i {}.pem ubuntu@{} "cd pl_works && chmod +x deploy.sh && sudo ./deploy.sh" '''.format("csc326_group18", pub_ip)
+    deploy_cmd = '''ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i {}.pem ubuntu@{} "cd pl_works && chmod +x deploy.sh && sudo ./deploy.sh" '''.format("csc326_group18", pub_ip)
     print "executing -> "+ deploy_cmd
     os.system(deploy_cmd)
 
     print('New instance "' + instance.id + '" accessible at ' + instance.public_dns_name + " DNS/IP: " + pub_dns + "/" + pub_ip )
+    print "Please use port:80 now"
     return (instance_id, pub_dns, pub_ip)
 
 if __name__ == "__main__":
