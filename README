@@ -1,3 +1,25 @@
+Public DNS/IP:
+  http://ec2-54-174-36-73.compute-1.amazonaws.com/search
+  54.174.36.73
+  Easier access on ur phone
+  http://bit.ly/hitsearch
+
+How to deploy a new website:
+1) remove csc326_group18.pem from backEnd/ if you see one
+2) remove csc326_group18 key pairs from AWS console if you see one
+3)
+  > cd backEnd
+  > python one_key_deployment.py ACCESS_KEY SECRETE_KEY
+Note: use port 80 instead of 8080
+Pound will redirect port 80 traffic to two bottle apps on 8081 and 8082
+
+How to terminate a instance:
+> cd backEnd
+> python one_key_terminate.py  ACCESS_KEY SECRETE_KEY INSTANCE_ID
+
+Final report:
+rpts/group18_­csc326­2014.pdf
+
 Code structure:
   - backEnd/    #backEnd source code
   - deploy.sh   #deploy.sh auto run on aws
@@ -40,17 +62,3 @@ Code structure:
       pg_reducer.py
       pg_reducer_generator.py
 
-Public DNS/IP:
-  TODO:
-
-How to deploy a new website:
-> cd backEnd
-> python one_key_deployment.py ACCESS_KEY SECRETE_KEY
-Note: use port 80 instead of 8080
-
-How to terminate a instance:
-> cd backEnd
-> python one_key_terminate.py  ACCESS_KEY SECRETE_KEY INSTANCE_ID
-
-Final report:
-rpts/group18_­csc326­2014.pdf
