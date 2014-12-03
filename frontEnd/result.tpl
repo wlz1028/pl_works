@@ -65,7 +65,7 @@
         %for n in URLS[10*PAGE_NUMBER-10:PAGE_NUMBER*10]:
             %title = n['title']
             %url = n['url']
-            %description = n['description']
+            %description = n['description'].capitalize()
         <tr>
             <td><a href="{{url}}" target="_blank" style = "font-size:150%">{{title}}</td>
         </tr>

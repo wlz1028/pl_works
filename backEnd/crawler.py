@@ -23,7 +23,7 @@ import urllib2
 import urlparse
 from BeautifulSoup import *
 from collections import defaultdict
-import re
+import re, traceback
 
 DESCRIPTION_LEN = 250
 
@@ -222,7 +222,7 @@ class crawler(object):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
         if not self._url_description[self._curr_doc_id]["title"]:
-            self._url_description[self._curr_doc_id]["title"] = title_text
+            self._url_description[self._curr_doc_id]["title"] = title_text.replace('&amp','')
 
 
     def _visit_a(self, elem):
@@ -258,21 +258,27 @@ class crawler(object):
         """Add some text to the document. This records word ids and word font sizes
         into the self._curr_words list for later processing."""
         words = WORD_SEPARATORS.split(elem.string.lower())
-        #lizwang: add description  and text len is controled by DESCRIPTION_LEN
-        sentence = " ".join(" ".join(w for w in words if w not in self._ignored_words).split())
-        if self._desc_word_count < DESCRIPTION_LEN:
-            if len(sentence) <= DESCRIPTION_LEN - self._desc_word_count:
-                self._url_description[self._curr_doc_id]["description"] += sentence
-                self._desc_word_count += len(sentence)
-            else:
-                self._url_description[self._curr_doc_id]["description"] += sentence[:DESCRIPTION_LEN - self._desc_word_count]
-                self._desc_word_count = DESCRIPTION_LEN
-
+        parse_tags = ['p', 'i', 'b','i','tt', 'cite', 'em', 'strong', 'h1','h2','h3','h4','h5','h6', 'font']
         for word in words:
             word = word.strip()
             if word in self._ignored_words:
                 continue
             self._curr_words.append((self.word_id(word), self._font_size))
+
+        ignore_words = ['', 'nbsp']
+
+        #Add page description
+        if len(words) >5:
+            for word in words:
+                if word in ignore_words:
+                    continue
+                if elem.parent.name.lower() not  in parse_tags or isinstance(elem, Tag):
+                    continue
+                desc = self._url_description[self._curr_doc_id]['description']
+                if len(desc.split()) < 150:
+                    desc += word + " "
+                    self._url_description[self._curr_doc_id]['description'] = desc
+
 
     def _text_of(self, elem):
         """Get the text inside some element without any tags."""
