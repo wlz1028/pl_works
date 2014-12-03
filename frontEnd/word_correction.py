@@ -27,7 +27,6 @@ def known(words):
     return set(w for w in words if w in WORDS_COUNT)
 
 def correct(word):
-    print word
     candidates = known([word]) or known(check(word)) or check_again(word) or [word]
     #the word that appears more time in WORDS_COUNT
     return max(candidates, key = WORDS_COUNT.get)

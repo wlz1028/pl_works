@@ -222,7 +222,7 @@ class crawler(object):
         """Called when visiting the <title> tag."""
         title_text = self._text_of(elem).strip()
         if not self._url_description[self._curr_doc_id]["title"]:
-            self._url_description[self._curr_doc_id]["title"] = title_text.replace('&amp','')
+            self._url_description[self._curr_doc_id]["title"] = title_text.replace('&amp;','')
 
 
     def _visit_a(self, elem):

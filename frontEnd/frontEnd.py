@@ -122,7 +122,6 @@ def redirect_page():
     s.save()
     redirect('/search')
 
-#TODO: ISSUE-when user logout, and then login, no login page
 @get('/logout')
 def logout():
     request.environ.get('beaker.session').delete()
