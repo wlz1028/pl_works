@@ -265,7 +265,7 @@ class crawler(object):
                 continue
             self._curr_words.append((self.word_id(word), self._font_size))
 
-        ignore_words = ['', 'nbsp']
+        ignore_words = ['', 'nbsp' , '038']
 
         #Add page description
         if len(words) >5:
@@ -340,6 +340,14 @@ class crawler(object):
             # text (text, cdata, comments, etc.)
             else:
                 self._add_text(tag)
+
+        #fix title and description format
+#        title = self._url_description[self._curr_doc_id]['title']
+#        desc = self._url_description[self._curr_doc_id]['description']
+#        regex = re.compile(r'&\S*')
+#        self._url_description[self._curr_doc_id]['title'] = re.sub(regex, '', title)
+#        self._url_description[self._curr_doc_id]['description'] = re.sub(regex, '', desc)
+
 
     def crawl(self, depth=2, timeout=3):
         """Crawl the web!"""
